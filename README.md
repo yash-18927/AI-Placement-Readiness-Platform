@@ -5,7 +5,7 @@
 [![Gemini AI](https://img.shields.io/badge/Gemini_AI-2.5_Flash-orange?logo=google-gemini&style=flat-square)](https://ai.google.dev/)
 [![GitHub API](https://img.shields.io/badge/GitHub_API-REST-lightgrey?logo=github&style=flat-square)](https://docs.github.com/en/rest)
 
-**CareerAI** is a premium, placement-readiness assessment web application powered by Next.js 14 and Gemini 2.5 Flash. It evaluates a student or candidate's placement readiness by cross-referencing their PDF resume and their actual GitHub coding footprint.
+**AI PLACEMENT READINESS PLATFORM** is a premium, placement-readiness assessment web application powered by Next.js 14 and Gemini 2.5 Flash. It evaluates a student or candidate's placement readiness by cross-referencing their PDF resume and their actual GitHub coding footprint.
 
 ---
 
@@ -67,7 +67,7 @@
    npm run dev
    ```
 
-5. Visit [http://localhost:3000](http://localhost:3000) inside your web browser.
+5. Visit https://ai-placement-readiness-platform-bp7y5ye4q.vercel.app inside your web browser.
 
 ---
 
