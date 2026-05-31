@@ -33,7 +33,8 @@ export default function OfflinePage() {
       }`}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <svg viewBox="0 0 100 100" className={`w-8 h-8 shrink-0 ${
+            {/* Desktop Brand Logo Monogram: left-aligned only on desktop */}
+            <svg viewBox="0 0 100 100" className={`w-8 h-8 shrink-0 hidden md:block ${
               isDark ? "stroke-white" : "stroke-[#202124]"
             }`} fill="none" strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M46 16 L20 78" />
@@ -42,12 +43,23 @@ export default function OfflinePage() {
               <path d="M57 52 L57 78" />
               <path d="M48 32 C68 28, 80 38, 77 52 C75 64, 66 68, 57 52" />
             </svg>
-            <span className={`text-md font-bold tracking-tight ${
+            <span className={`text-[13px] sm:text-md font-extrabold tracking-tight uppercase ${
               isDark ? "text-white" : "text-[#202124]"
             }`}>
               AI Placement Readiness Platform
             </span>
           </div>
+
+          {/* Mobile Brand Logo Monogram: aligned far-right in mobile view */}
+          <svg viewBox="0 0 100 100" className={`w-8 h-8 shrink-0 block md:hidden ${
+            isDark ? "stroke-white" : "stroke-[#202124]"
+          }`} fill="none" strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M46 16 L20 78" />
+            <path d="M46 16 L65 72" />
+            <path d="M33 52 L57 52" />
+            <path d="M57 52 L57 78" />
+            <path d="M48 32 C68 28, 80 38, 77 52 C75 64, 66 68, 57 52" />
+          </svg>
         </div>
       </header>
 
