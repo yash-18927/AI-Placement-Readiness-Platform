@@ -383,16 +383,17 @@ export default function Home() {
             <svg viewBox="0 0 100 100" className={`w-8 h-8 shrink-0 hidden md:block ${
               isDark ? "stroke-white" : "stroke-[#202124]"
             }`} fill="none" strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M46 16 L20 78" />
-              <path d="M46 16 L65 72" />
-              <path d="M33 52 L57 52" />
-              <path d="M57 52 L57 78" />
-              <path d="M48 32 C68 28, 80 38, 77 52 C75 64, 66 68, 57 52" />
+              <path d="M32 80 L50 20" />
+              <path d="M50 20 L68 80" />
+              <path d="M40 53 L56 53" />
+              <path d="M56 53 L56 80" />
+              <path d="M40 53 C40 32, 72 32, 72 45 C72 51, 66 53, 56 53" />
             </svg>
-            <span className={`text-[13px] sm:text-md font-extrabold tracking-tight uppercase ${
+            <span className={`text-[14px] sm:text-[17px] font-extrabold tracking-tight leading-tight flex flex-col ${
               isDark ? "text-white" : "text-[#202124]"
             }`}>
-              AI Placement Readiness Platform
+              <span>AI Placement Readiness</span>
+              <span className="-mt-0.5 text-[#1a73e8] dark:text-[#8ab4f8]">Platform</span>
             </span>
           </div>
 
@@ -466,11 +467,11 @@ export default function Home() {
             <svg viewBox="0 0 100 100" className={`w-8 h-8 shrink-0 block md:hidden cursor-pointer ${
               isDark ? "stroke-white" : "stroke-[#202124]"
             }`} fill="none" strokeWidth="8.5" strokeLinecap="round" strokeLinejoin="round" onClick={() => smoothScrollTo("home")}>
-              <path d="M46 16 L20 78" />
-              <path d="M46 16 L65 72" />
-              <path d="M33 52 L57 52" />
-              <path d="M57 52 L57 78" />
-              <path d="M48 32 C68 28, 80 38, 77 52 C75 64, 66 68, 57 52" />
+              <path d="M32 80 L50 20" />
+              <path d="M50 20 L68 80" />
+              <path d="M40 53 L56 53" />
+              <path d="M56 53 L56 80" />
+              <path d="M40 53 C40 32, 72 32, 72 45 C72 51, 66 53, 56 53" />
             </svg>
           </div>
         </div>
