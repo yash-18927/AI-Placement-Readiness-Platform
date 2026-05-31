@@ -30,6 +30,10 @@ export default function Home() {
   const [historyList, setHistoryList] = useState<any[]>([]);
   const [rotatingStatusIndex, setRotatingStatusIndex] = useState<number>(0);
 
+  // PWA Installation Prompts States
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState<boolean>(false);
+
   // Refs for tracking states during interval
   const isApiFinishedRef = useRef(false);
   const apiDataRef = useRef<any>(null);
@@ -42,7 +46,7 @@ export default function Home() {
     apiDataRef.current = apiData;
   }, [apiData]);
 
-  // Load theme and history preference from localStorage on mount
+  // Load theme, history preference, and listen for PWA install events on mount
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
     if (storedTheme === "dark") {
@@ -57,6 +61,23 @@ export default function Home() {
     } catch (err) {
       console.error("Failed to load evaluation history:", err);
     }
+
+    // PWA beforeinstallprompt event capture
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setIsInstallable(false);
+    }
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    };
   }, []);
 
   // Dynamically apply theme to document element
@@ -338,6 +359,15 @@ export default function Home() {
     }
   };
 
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`PWA Install Choice Outcome: ${outcome}`);
+    setDeferredPrompt(null);
+    setIsInstallable(false);
+  };
+
   return (
     <div id="home" className={`relative min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-250 ${
       isDark ? "bg-[#202124] text-[#e8eaed] font-sans" : "bg-[#f8f9fa] text-[#3c4043] font-sans"
@@ -376,6 +406,16 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* PWA Install Button */}
+            {isInstallable && (
+              <button
+                onClick={handleInstallClick}
+                className="hidden sm:flex text-[10px] font-bold px-3.5 py-2 rounded-full bg-[#1a73e8] hover:bg-[#1557b0] text-white transition items-center gap-1 shadow-sm active:scale-95 animate-pulse uppercase tracking-wider"
+              >
+                <span>📥</span> Install App
+              </button>
+            )}
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -434,6 +474,14 @@ export default function Home() {
               )}
             </button>
             <button onClick={() => smoothScrollTo("about")} className={`text-left text-xs font-bold py-1 transition ${isDark ? "text-zinc-300 hover:text-white" : "text-[#5f6368] hover:text-[#202124]"}`}>About</button>
+            {isInstallable && (
+              <button
+                onClick={handleInstallClick}
+                className="w-full text-center text-xs font-bold py-2.5 px-4 rounded-full bg-[#1a73e8] text-white flex items-center justify-center gap-1.5 shadow-sm active:scale-95 mt-1"
+              >
+                <span>📥</span> Install Application
+              </button>
+            )}
           </div>
         )}
       </header>

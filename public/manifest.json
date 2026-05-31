@@ -1,0 +1,29 @@
+{
+  "short_name": "Placement Readiness",
+  "name": "AI Placement Readiness Platform",
+  "description": "Analyze your resume and GitHub profile to discover placement readiness metrics, strengths, weaknesses, and improvement roadmaps.",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-icon.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#202124",
+  "theme_color": "#1a73e8",
+  "display": "standalone",
+  "orientation": "portrait"
+}
