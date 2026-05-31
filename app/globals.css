@@ -10,10 +10,27 @@
   }
 }
 
+/* Smooth page transitions keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 /* Scroll offset for sticky headers */
 html {
   scroll-padding-top: 80px;
   scroll-behavior: smooth;
+  scrollbar-gutter: stable; /* Completely prevents horizontal widescreen scrollbar shift */
 }
 
 /* Theme-aware scrollbars */
@@ -51,9 +68,8 @@ html {
   background: #3f3f46;
 }
 
-/* SaaS Custom Printing stylesheet */
+/* SaaS Custom Printing stylesheet - Continuous Digital Record Layout */
 @media print {
-  /* Dynamic Digital Portfolio vs Standard Paper configurations */
   body, html {
     background: #ffffff !important;
     color: #202124 !important;
@@ -63,10 +79,9 @@ html {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
   }
 
-  /* Set page margins cleanly */
   @page {
     size: A4 portrait;
-    margin: 1.5cm 1.5cm 1.5cm 1.5cm;
+    margin: 1.2cm 1.2cm;
   }
 
   /* Hide interactive screenspace controls, navigations and option panels */
@@ -74,45 +89,45 @@ html {
     display: none !important;
   }
 
-  /* Force browsers to print exact background colors and vector parameters */
+  /* Force print exact background colors */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Simplify grids to standard single-column blocks to prevent clipping or text overlap */
   main {
     padding: 0 !important;
     margin: 0 !important;
     display: block !important;
   }
 
+  /* Prevent overlapping by converting complex grids to continuous flex/blocks */
   .grid, .lg\:grid-cols-12, .grid-cols-1, .grid-cols-3, .lg\:grid-cols-3 {
     display: block !important;
     width: 100% !important;
   }
 
-  /* Ensure card blocks are properly isolated and avoid breaking awkwardly in mid-sheet */
+  /* Clean print card wrappers */
   .print-card {
     border: 1px solid #dadce0 !important;
     background: #ffffff !important;
     box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    margin-bottom: 24px !important;
-    padding: 20px !important;
+    margin-bottom: 20px !important;
+    padding: 18px !important;
     border-radius: 12px !important;
     color: #202124 !important;
     display: block !important;
     width: 100% !important;
   }
 
-  /* Preserve SVG circular score layouts in center */
+  /* Center the score SVG */
   .relative.w-36.h-36 {
     margin: 0 auto !important;
   }
 
-  /* Render all 3 roadmap steps sequentially for physical report pages */
+  /* Render roadmap panels sequentially in print */
   .roadmap-print-all {
     display: block !important;
     width: 100% !important;
@@ -120,27 +135,26 @@ html {
 
   .roadmap-tab-panel {
     display: block !important;
-    margin-bottom: 20px !important;
+    margin-bottom: 15px !important;
     border: 1px solid #dadce0 !important;
-    padding: 16px !important;
+    padding: 14px !important;
     border-radius: 12px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  /* Color resets for recruiter handouts */
   h1, h2, h3, h4, strong {
     color: #202124 !important;
   }
 
-  /* Universal print highlights */
+  /* Color matching tags for print output */
   [class*="bg-emerald-500"], [class*="bg-red-500"], [class*="bg-amber-500"], [class*="bg-violet-500"] {
     background-color: #f8f9fa !important;
     border: 1px solid #dadce0 !important;
     color: #202124 !important;
   }
 
-  /* Preserve full rich colors if Digital Portfolio Mode is selected */
+  /* Continuous Digital Scorecard preserve styles */
   .print-digital-theme {
     background-color: #202124 !important;
     color: #e8eaed !important;

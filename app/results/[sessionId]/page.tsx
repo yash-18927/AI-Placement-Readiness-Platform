@@ -59,8 +59,9 @@ export default function ResultsPage() {
   // Light / Dark Mode state (Google theme defaults to clean Light mode)
   const [isDark, setIsDark] = useState<boolean>(false);
 
-  // PDF Export Format Mode Toggle State
-  const [exportMode, setExportMode] = useState<"paper" | "digital">("paper");
+  // PDF Export Options Panel State
+  const [showExportPanel, setShowExportPanel] = useState<boolean>(false);
+  const [exportAction, setExportAction] = useState<"download" | "print">("download");
 
   // Load theme preference and analysis data from localStorage on mount
   useEffect(() => {
@@ -130,6 +131,56 @@ export default function ResultsPage() {
         { q: "Contrast Client-Side Rendering (CSR), Server-Side Rendering (SSR), and Static Site Generation (SSG) in React.", category: "Frontend Architectures" },
         { q: "What is CORS (Cross-Origin Resource Sharing)? How does the browser enforce preflight checks, and how do you resolve it?", category: "Web Standards" },
         { q: "How do database indexes improve query speeds? What write-performance trade-offs do they introduce?", category: "Database Indexing" }
+      ],
+      "Cloud Engineer Intern": [
+        { q: "Explain the core differences between horizontal and vertical scaling in AWS/GCP. When is horizontal scaling preferred?", category: "Cloud Scaling" },
+        { q: "What are security groups vs network ACLs in a virtual private cloud (VPC)? How do they secure network traffic?", category: "Cloud Network Security" },
+        { q: "What is Serverless computing (e.g. AWS Lambda)? Discuss the benefits and the classic 'cold start' performance trade-off.", category: "Serverless Architectures" }
+      ],
+      "DevOps Intern": [
+        { q: "What is containerization? Contrast the resource efficiency and isolation of Docker containers vs traditional Virtual Machines.", category: "Containerization" },
+        { q: "What is Git Rebase vs Git Merge? In what development workflow scenarios would you advise a team to use rebase?", category: "Version Control" },
+        { q: "Explain the purpose of a Continuous Integration (CI) server. What tasks should be automated during every pull request?", category: "Continuous Integration" }
+      ],
+      "Software Engineer (Full-Time)": [
+        { q: "Explain how you would design a highly available, distributed rate limiter (e.g. token bucket) to protect an API gateway.", category: "System Design" },
+        { q: "How does the virtual memory system map pages to physical frames? Explain page faults and translation lookaside buffers (TLB).", category: "OS Memory Management" },
+        { q: "Contrast optimistic concurrency control with pessimistic locking. In what database transaction environments is Suited?", category: "Concurrency Controls" }
+      ],
+      "Machine Learning Engineer": [
+        { q: "What is the difference between data parallelism and model parallelism when training large deep learning architectures (e.g. Transformers) across GPUs?", category: "Distributed Deep Learning" },
+        { q: "Explain the bias-variance trade-off. How do techniques like dropout, early stopping, and weight decay prevent overfitting?", category: "Model Regularization" },
+        { q: "How do you deploy and monitor ML models in production? Discuss feature stores and drift detection (concept vs data drift).", category: "MLOps & Deployments" }
+      ],
+      "Data Science Engineer": [
+        { q: "Explain the difference between supervised, unsupervised, and semi-supervised learning. When would you use a Random Forest vs a Gradient Boosted Tree?", category: "Machine Learning Algorithms" },
+        { q: "Describe how you would design an A/B test for a new landing page. How do you calculate sample size and statistical power?", category: "Experimentation & Stats" },
+        { q: "What are the standard database normal forms (1NF, 2NF, 3NF)? When is denormalization preferred in a data warehouse environment?", category: "Data Warehousing" }
+      ],
+      "Cloud Engineer": [
+        { q: "Explain the core difference between horizontal and vertical scaling. How does load balancing handle stateful user sessions?", category: "Cloud Infrastructure" },
+        { q: "What is Infrastructure as Code (IaC)? Contrast declarative tools like Terraform with imperative tools like AWS CDK or shell scripts.", category: "IaC & Terraform" },
+        { q: "Describe the shared responsibility model in cloud platforms (e.g. AWS or GCP). Who is responsible for patching guest operating systems vs hypervisors?", category: "Cloud Platform Security" }
+      ],
+      "Full Stack Developer": [
+        { q: "Explain how WebSockets facilitate full-duplex communication. How would you scale a real-time chat application to handle 100k active connections?", category: "Real-Time Systems" },
+        { q: "Describe the architectural difference between REST and GraphQL. In what frontend rendering scenarios is GraphQL preferred?", category: "API Architectures" },
+        { q: "How do security risks like CSRF (Cross-Site Request Forgery) differ from XSS (Cross-Site Scripting)? How do you mitigate them in Next.js?", category: "Application Security" }
+      ],
+      "DevOps Engineer": [
+        { q: "Explain the containerization model of Docker vs Virtual Machines. How does Kubernetes manage namespace routing and pod lifecycles?", category: "Containers & Kubernetes" },
+        { q: "Describe a modern CI/CD pipeline flow. How do you implement canary deployments or blue-green updates to achieve zero-downtime releases?", category: "CI/CD Workflows" },
+        { q: "Explain the concepts of GitOps and continuous deployment. How do tools like ArgoCD or Flux verify active state alignment?", category: "GitOps Infrastructure" }
+      ],
+      "Data Analyst (Full-Time)": [
+        { q: "What is the difference between an OLTP and an OLAP database schema? Contrast star schemas with snowflake schemas for analytical pipelines.", category: "Data Architecture" },
+        { q: "Explain statistical correlation vs causation. How would you handle variables that demonstrate multicollinearity in a regression analysis?", category: "Quantitative Analysis" },
+        { q: "Describe how window functions in SQL (like PARTITION BY and DENSE_RANK) differ from standard GROUP BY aggregations.", category: "Advanced SQL Queries" }
+      ],
+      "Cybersecurity Engineer": [
+        { q: "What is the OWASP Top 10? Explain SQL Injection, Cross-Site Scripting (XSS), and how to defend against them using proper inputs and security headers.", category: "Web Security" },
+        { q: "Describe how public key cryptography (RSA/ECC) works. How does TLS establish a secure session between a client and a server?", category: "Cryptography & TLS" },
+        { q: "Explain the concept of Zero Trust architecture. How do you implement access controls and least privilege in an enterprise network?", category: "Network Security" }
       ]
     };
 
@@ -151,7 +202,7 @@ export default function ResultsPage() {
 
   const handlePrint = () => {
     const root = window.document.documentElement;
-    if (exportMode === "digital") {
+    if (exportAction === "download") {
       root.classList.add("print-digital-theme");
     } else {
       root.classList.remove("print-digital-theme");
@@ -301,7 +352,7 @@ export default function ResultsPage() {
       </header>
 
       {/* Main Container */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-8 flex flex-col gap-8">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-8 flex flex-col gap-8 animate-fade-in">
         
         {/* EXECUTIVE INTRO HEADER BLOCK */}
         <section className={`border rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 print-card ${
@@ -929,61 +980,8 @@ export default function ResultsPage() {
             </p>
           </div>
 
-          {/* Interactive Export Mode Selection Panel */}
-          <div className="mb-6 p-4 rounded-xl border border-[#dadce0] dark:border-[#3c4043] bg-[#f8f9fa] dark:bg-[#202124] no-print">
-            <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 text-left ${
-              isDark ? "text-white" : "text-[#202124]"
-            }`}>
-              Select PDF Export Format
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Option 1: Recruiter Handout */}
-              <div
-                onClick={() => setExportMode("paper")}
-                className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
-                  exportMode === "paper"
-                    ? "border-[#34a853] bg-[#34a853]/5 dark:bg-[#34a853]/10"
-                    : "border-[#dadce0] dark:border-[#3c4043] bg-white dark:bg-[#2d2d30] hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="exportMode"
-                  checked={exportMode === "paper"}
-                  onChange={() => setExportMode("paper")}
-                  className="mt-0.5 accent-[#34a853]"
-                />
-                <div className="text-left">
-                  <p className="text-xs font-bold dark:text-white">📄 Recruiter Handout Format</p>
-                  <p className="text-[10px] text-zinc-500 mt-0.5">Optimized for physical printing on standard A4 paper. Strips backgrounds and handles page breaks cleanly.</p>
-                </div>
-              </div>
-
-              {/* Option 2: Digital Career Portfolio */}
-              <div
-                onClick={() => setExportMode("digital")}
-                className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
-                  exportMode === "digital"
-                    ? "border-[#1a73e8] bg-[#1a73e8]/5 dark:bg-[#1a73e8]/10"
-                    : "border-[#dadce0] dark:border-[#3c4043] bg-white dark:bg-[#2d2d30] hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="exportMode"
-                  checked={exportMode === "digital"}
-                  onChange={() => setExportMode("digital")}
-                  className="mt-0.5 accent-[#1a73e8]"
-                />
-                <div className="text-left">
-                  <p className="text-xs font-bold dark:text-white">💻 Digital Career Portfolio</p>
-                  <p className="text-[10px] text-zinc-500 mt-0.5">Optimized for digital sharing. Preserves your active light/dark dashboard theme styling perfectly.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center gap-4 no-print flex-col sm:flex-row">
+          {/* Interactive Print & Download Control Card */}
+          <div className="flex justify-center gap-4 no-print flex-col sm:flex-row mb-6">
             <button
               onClick={() => router.push("/")}
               className={`font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-full transition-all shadow-sm active:scale-95 border ${
@@ -995,12 +993,123 @@ export default function ResultsPage() {
               🔄 Analyze Another Profile
             </button>
             <button
-              onClick={handlePrint}
-              className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-full transition-all shadow-sm active:scale-95"
+              onClick={() => setShowExportPanel(!showExportPanel)}
+              className={`font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-full transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 ${
+                showExportPanel
+                  ? "bg-[#ea4335] hover:bg-[#d93025] text-white"
+                  : "bg-[#1a73e8] hover:bg-[#1557b0] text-white"
+              }`}
             >
-              📥 Download Report PDF
+              <span>🖨</span> {showExportPanel ? "Hide Export Options" : "Print & Download"}
             </button>
           </div>
+
+          {/* Smooth Expanding Export Panel */}
+          {showExportPanel && (
+            <div className={`mb-6 p-5 rounded-2xl border transition-all duration-300 animate-fade-in no-print text-left ${
+              isDark ? "bg-[#2d2d30] border-[#3c4043] shadow-lg" : "bg-white border-[#dadce0] shadow-md"
+            }`}>
+              <div className="mb-4">
+                <h4 className={`text-sm font-bold tracking-tight ${isDark ? "text-white" : "text-[#202124]"}`}>
+                  Configure Export Settings
+                </h4>
+                <p className={`text-xs mt-1 ${isDark ? "text-zinc-400" : "text-zinc-500"}`}>
+                  Customize the format for saving or printing your Career Telemetry Report.
+                </p>
+              </div>
+
+              {/* Segmented Control Toggle Pill */}
+              <div className={`p-1 rounded-full flex gap-1 mb-4 ${
+                isDark ? "bg-[#202124]" : "bg-zinc-100"
+              }`}>
+                <button
+                  type="button"
+                  onClick={() => setExportAction("download")}
+                  className={`flex-1 py-2 px-4 rounded-full text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 ${
+                    exportAction === "download"
+                      ? isDark
+                        ? "bg-[#1a73e8] text-white shadow-md"
+                        : "bg-white text-[#1a73e8] shadow-sm"
+                      : isDark
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  <span>📥</span> Download PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setExportAction("print")}
+                  className={`flex-1 py-2 px-4 rounded-full text-xs font-bold transition-all duration-200 flex items-center justify-center gap-1.5 ${
+                    exportAction === "print"
+                      ? isDark
+                        ? "bg-[#34a853] text-white shadow-md"
+                        : "bg-white text-[#34a853] shadow-sm"
+                      : isDark
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  <span>🖨</span> Print PDF
+                </button>
+              </div>
+
+              {/* Dynamic Tip Message */}
+              <div className={`p-3.5 rounded-xl border text-xs leading-relaxed flex items-start gap-2.5 mb-5 ${
+                exportAction === "download"
+                  ? isDark
+                    ? "bg-[#1a73e8]/10 border-[#1a73e8]/25 text-[#8ab4f8]"
+                    : "bg-[#1a73e8]/5 border-[#1a73e8]/20 text-[#1a73e8]"
+                  : isDark
+                    ? "bg-[#34a853]/10 border-[#34a853]/25 text-[#81c784]"
+                    : "bg-[#34a853]/5 border-[#34a853]/20 text-[#34a853]"
+              }`}>
+                <span className="text-sm">💡</span>
+                <div>
+                  <p className="font-bold">
+                    {exportAction === "download" ? "Save Digitally (Dashboard Theme)" : "Physical Printer Friendly (Ink-Saver)"}
+                  </p>
+                  <p className={`mt-0.5 text-[11px] ${isDark ? "text-zinc-350" : "text-zinc-650"}`}>
+                    {exportAction === "download"
+                      ? "Generates a gorgeous full-color dashboard document preserving your dark/light modes. Simply select 'Save as PDF' as the destination in the print screen."
+                      : "Strips background fills and uses pure white base styles with optimized dark high-contrast typography, perfect for physical printing to standard A4 paper without wasting ink."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Export Trigger Button */}
+              <div className="flex justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowExportPanel(false)}
+                  className={`text-xs font-bold px-4 py-2 rounded-full border transition ${
+                    isDark ? "border-[#3c4043] text-zinc-300 hover:bg-[#3c4043]" : "border-[#dadce0] text-zinc-600 hover:bg-zinc-50"
+                  }`}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className={`text-xs font-bold px-6 py-2 rounded-full text-white shadow-sm active:scale-95 transition flex items-center gap-1.5 ${
+                    exportAction === "download"
+                      ? "bg-[#1a73e8] hover:bg-[#1557b0]"
+                      : "bg-[#34a853] hover:bg-[#2c8c47]"
+                  }`}
+                >
+                  {exportAction === "download" ? (
+                    <>
+                      <span>📥</span> Proceed to Download
+                    </>
+                  ) : (
+                    <>
+                      <span>🖨</span> Proceed to Print
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </main>
 

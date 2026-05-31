@@ -95,10 +95,23 @@ export default function Home() {
   };
 
   const roles = [
-    "AI/ML Intern",
+    // Technology Internships
     "Software Engineer Intern",
+    "AI/ML Intern",
     "Data Analyst Intern",
     "Full Stack Intern",
+    "Cloud Engineer Intern",
+    "DevOps Intern",
+    
+    // Actual Placements (Full-Time Engineers)
+    "Software Engineer (Full-Time)",
+    "Machine Learning Engineer",
+    "Data Science Engineer",
+    "Cloud Engineer",
+    "Full Stack Developer",
+    "DevOps Engineer",
+    "Data Analyst (Full-Time)",
+    "Cybersecurity Engineer",
   ];
 
   const rotatingStatuses = [
@@ -426,12 +439,12 @@ export default function Home() {
       </header>
 
       {/* Main Page Layout */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col gap-16">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-6 py-12 flex flex-col gap-16 animate-fade-in">
         
         {/* COMPACT HERO SECTION */}
         <section className="text-center pt-2 md:pt-6 max-w-3xl mx-auto flex flex-col items-center">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-bold tracking-wider border bg-[#1a73e8]/5 dark:bg-[#1a73e8]/10 border-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] mb-6">
-            Google Cloud Platform Partner Style
+            Created by Yash Vardhan Singh • Test your placement readiness
           </span>
           
           <h1 className={`text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-[1.15] ${
@@ -695,7 +708,7 @@ export default function Home() {
                         type="text"
                         value={githubUsername}
                         onChange={(e) => setGithubUsername(e.target.value)}
-                        placeholder="e.g. torvalds"
+                        placeholder="e.g. yash-18927"
                         className={`w-full border focus:ring-1 outline-none transition rounded-xl py-3.5 pl-8 pr-4 text-xs ${
                           isDark
                             ? "bg-[#202124]/50 border-[#3c4043] focus:border-[#1a73e8] focus:ring-[#1a73e8] text-white placeholder-zinc-650"
@@ -709,7 +722,7 @@ export default function Home() {
                     <label className={`text-xs font-bold uppercase tracking-wider mb-2 ${
                       isDark ? "text-zinc-400" : "text-[#5f6368]"
                     }`}>
-                      03. Targeted Internship path
+                      03. Targeted Career Path
                     </label>
                     <div className="relative">
                       <select
