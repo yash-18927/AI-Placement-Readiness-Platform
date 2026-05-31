@@ -6,7 +6,30 @@
   body {
     background-color: #0f0f13;
     color: #f3f4f6;
+    scroll-behavior: smooth;
   }
+}
+
+/* Scroll offset for sticky headers */
+html {
+  scroll-padding-top: 80px;
+  scroll-behavior: smooth;
+}
+
+/* Theme-aware scrollbars */
+.light ::-webkit-scrollbar-track,
+.light::-webkit-scrollbar-track {
+  background: #fafafa;
+}
+
+.light ::-webkit-scrollbar-thumb,
+.light::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+}
+
+.light ::-webkit-scrollbar-thumb:hover,
+.light::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
 }
 
 /* Custom modern scrollbar styles */
@@ -26,4 +49,80 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #3f3f46;
+}
+
+/* SaaS Custom Printing stylesheet */
+@media print {
+  body, html {
+    background: #ffffff !important;
+    color: #09090b !important;
+    font-size: 12pt !important;
+  }
+
+  /* Hide interactive controls and screenspace UI elements */
+  header, footer, button, select, input, .no-print, [role="tablist"], [title="Switch to Light Mode"], [title="Switch to Dark Mode"] {
+    display: none !important;
+  }
+
+  /* Force print background colors/gradients */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Layout optimization for paper sheet sizes */
+  .max-w-6xl {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Ensure card blocks are clean and avoid awkward middle-cutoffs */
+  .print-card {
+    border: 1px solid #e4e4e7 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 20px !important;
+    padding: 20px !important;
+    border-radius: 8px !important;
+    color: #09090b !important;
+  }
+
+  /* Display all roadmap steps at once during PDF output instead of hiding behind active tabs */
+  .roadmap-print-all {
+    display: block !important;
+  }
+
+  .roadmap-tab-panel {
+    display: block !important;
+    margin-bottom: 25px !important;
+    border: 1px solid #e4e4e7 !important;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Typography color stabilization for paper ink */
+  h1, h2, h3, h4, strong {
+    color: #09090b !important;
+  }
+
+  .text-violet-400, .text-indigo-400, .text-emerald-400, .text-red-400, .text-amber-400 {
+    color: #18181b !important;
+    font-weight: bold !important;
+  }
+
+  .bg-emerald-500\/10, .bg-red-500\/10, .bg-amber-500\/10, .bg-violet-500\/10 {
+    background-color: #f4f4f5 !important;
+    border: 1px solid #e4e4e7 !important;
+  }
+
+  /* Layout spacing */
+  main {
+    padding-top: 0 !important;
+  }
 }
