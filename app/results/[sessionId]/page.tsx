@@ -301,6 +301,22 @@ export default function ResultsPage() {
       isDark ? "bg-[#202124] text-[#e8eaed] font-sans" : "bg-[#f8f9fa] text-[#3c4043] font-sans"
     }`}>
       
+      {/* Dynamic Faded Ambient Background Glows */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className={`absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full filter blur-[130px] opacity-[0.06] dark:opacity-[0.03] transition-all duration-700 ${
+          isDark ? "bg-[#1a73e8]" : "bg-[#1a73e8]/60"
+        }`} />
+        <div className={`absolute top-[35%] left-[-15%] w-[700px] h-[700px] rounded-full filter blur-[150px] opacity-[0.04] dark:opacity-[0.02] transition-all duration-700 ${
+          isDark ? "bg-[#8ab4f8]" : "bg-[#1a73e8]/40"
+        }`} />
+        <div className={`absolute top-[70%] right-[-10%] w-[600px] h-[600px] rounded-full filter blur-[130px] opacity-[0.05] dark:opacity-[0.02] transition-all duration-700 ${
+          isDark ? "bg-[#1a73e8]" : "bg-[#1a73e8]/50"
+        }`} />
+        <div className={`absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full filter blur-[130px] opacity-[0.06] dark:opacity-[0.03] transition-all duration-700 ${
+          isDark ? "bg-[#8ab4f8]" : "bg-[#1a73e8]/60"
+        }`} />
+      </div>
+      
       {/* Top Navbar */}
       <header className={`border-b sticky top-0 z-50 backdrop-blur-md transition-colors no-print ${
         isDark ? "border-[#3c4043] bg-[#202124]/90" : "border-[#dadce0] bg-white/90 shadow-sm"
