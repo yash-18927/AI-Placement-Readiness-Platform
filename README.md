@@ -67,7 +67,7 @@
    npm run dev
    ```
 
-5. Visit https://ai-placement-readiness-platform-bp7y5ye4q.vercel.app inside your web browser.
+5. Visit (https://ai-prp.vercel.app) inside your web browser.
 
 ---
 
