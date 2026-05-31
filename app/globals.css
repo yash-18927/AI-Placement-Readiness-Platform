@@ -26,6 +26,24 @@
   animation: fadeIn 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
+/* Ambient background drift */
+@keyframes ambientDrift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-ambient-bg {
+  background-size: 200% 200%;
+  animation: ambientDrift 20s ease-in-out infinite;
+}
+
 /* Scroll offset for sticky headers */
 html {
   scroll-padding-top: 80px;

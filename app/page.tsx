@@ -371,8 +371,8 @@ export default function Home() {
   };
 
   return (
-    <div id="home" className={`relative min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-250 ${
-      isDark ? "bg-[#202124] text-[#e8eaed] font-sans" : "bg-[#f8f9fa] text-[#3c4043] font-sans"
+    <div id="home" className={`relative min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-250 animate-ambient-bg ${
+      isDark ? "bg-gradient-to-br from-[#202124] via-[#1c2331] to-[#202124] text-[#e8eaed] font-sans" : "bg-gradient-to-br from-[#f8f9fa] via-[#edf2f9] to-[#f8f9fa] text-[#3c4043] font-sans"
     }`}>
       
       {/* Dynamic Faded Ambient Background Glows */}

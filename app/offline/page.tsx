@@ -23,8 +23,8 @@ export default function OfflinePage() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col justify-between transition-colors duration-200 ${
-      isDark ? "bg-[#202124] text-[#e8eaed]" : "bg-[#f8f9fa] text-[#3c4043]"
+    <div className={`min-h-screen flex flex-col justify-between transition-colors duration-200 animate-ambient-bg ${
+      isDark ? "bg-gradient-to-br from-[#202124] via-[#1c2331] to-[#202124] text-[#e8eaed]" : "bg-gradient-to-br from-[#f8f9fa] via-[#edf2f9] to-[#f8f9fa] text-[#3c4043]"
     } font-sans`}>
       
       {/* Top Navbar */}
