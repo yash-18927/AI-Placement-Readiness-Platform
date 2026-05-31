@@ -38,7 +38,7 @@ interface AnalysisResult {
   executive_summary: string;
   encouragement: string;
   readiness_label: "Beginner" | "Developing" | "Ready" | "Strong";
-  targetRole?: string; // Optional target role if parsed
+  targetRole?: string;
 }
 
 export default function ResultsPage() {
@@ -56,15 +56,15 @@ export default function ResultsPage() {
   // Terms and Conditions Modal State
   const [showTerms, setShowTerms] = useState<boolean>(false);
 
-  // Light / Dark Mode state
-  const [isDark, setIsDark] = useState<boolean>(true);
+  // Light / Dark Mode state (Google theme defaults to clean Light mode)
+  const [isDark, setIsDark] = useState<boolean>(false);
 
   // Load theme preference and analysis data from localStorage on mount
   useEffect(() => {
     setIsClient(true);
     const storedTheme = localStorage.getItem("theme");
-    if (storedTheme === "light") {
-      setIsDark(false);
+    if (storedTheme === "dark") {
+      setIsDark(true);
     }
 
     if (!sessionId) return;
@@ -89,12 +89,12 @@ export default function ResultsPage() {
     if (isDark) {
       root.classList.add("dark");
       root.classList.remove("light");
-      root.style.backgroundColor = "#0f0f13";
+      root.style.backgroundColor = "#202124"; // Google Dark Background
       root.style.colorScheme = "dark";
     } else {
       root.classList.add("light");
       root.classList.remove("dark");
-      root.style.backgroundColor = "#fafafa";
+      root.style.backgroundColor = "#f8f9fa"; // Google Light Background
       root.style.colorScheme = "light";
     }
   }, [isDark]);
@@ -153,10 +153,10 @@ export default function ResultsPage() {
   if (loading) {
     return (
       <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${
-        isDark ? "bg-[#0f0f13]" : "bg-zinc-50"
+        isDark ? "bg-[#202124]" : "bg-zinc-50"
       }`}>
         <div className="text-center">
-          <svg className="animate-spin h-8 w-8 text-violet-500 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-8 w-8 text-[#1a73e8] mx-auto mb-4" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
@@ -171,7 +171,7 @@ export default function ResultsPage() {
   if (!data) {
     return (
       <div className={`min-h-screen flex flex-col items-center justify-center p-6 text-center transition-colors duration-300 ${
-        isDark ? "bg-[#0f0f13]" : "bg-zinc-50"
+        isDark ? "bg-[#202124]" : "bg-zinc-50"
       }`}>
         <div className="w-14 h-14 rounded-full bg-red-950/20 border border-red-800/40 flex items-center justify-center mb-4 text-xl">
           ⚠️
@@ -179,12 +179,12 @@ export default function ResultsPage() {
         <h2 className={`text-xl font-bold mb-1.5 ${isDark ? "text-white" : "text-zinc-900"}`}>
           Evaluation Record Expired
         </h2>
-        <p className={`max-w-xs mb-6 text-xs leading-relaxed ${isDark ? "text-zinc-500" : "text-zinc-650"}`}>
+        <p className={`max-w-xs mb-6 text-xs leading-relaxed ${isDark ? "text-zinc-550" : "text-zinc-650"}`}>
           No analysis result was found for this session identifier. Run a fresh assessment from the home terminal.
         </p>
         <button
           onClick={() => router.push("/")}
-          className="bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl transition"
+          className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-full transition shadow-sm"
         >
           Return Home
         </button>
@@ -195,21 +195,21 @@ export default function ResultsPage() {
   const score = data.readiness_score;
   const inferredRole = data.targetRole || "Software Engineer Intern";
 
-  let scoreColor = "#10b981"; // green (70+)
-  let scoreBg = "bg-emerald-500/10";
-  let scoreBorder = "border-emerald-500/20";
-  let scoreText = "text-emerald-400";
+  let scoreColor = "#34a853"; // Google Green (70+)
+  let scoreBg = "bg-[#34a853]/10";
+  let scoreBorder = "border-[#34a853]/25";
+  let scoreText = "text-[#34a853] dark:text-[#81c784]";
 
   if (score < 40) {
-    scoreColor = "#ef4444"; // red
-    scoreBg = "bg-red-500/10";
-    scoreBorder = "border-red-500/20";
-    scoreText = "text-red-400";
+    scoreColor = "#ea4335"; // Google Red
+    scoreBg = "bg-[#ea4335]/10";
+    scoreBorder = "border-[#ea4335]/25";
+    scoreText = "text-[#ea4335] dark:text-[#e57373]";
   } else if (score < 70) {
-    scoreColor = "#f59e0b"; // amber
-    scoreBg = "bg-amber-500/10";
-    scoreBorder = "border-amber-500/20";
-    scoreText = "text-amber-400";
+    scoreColor = "#fbbc05"; // Google Yellow
+    scoreBg = "bg-[#fbbc05]/10";
+    scoreBorder = "border-[#fbbc05]/25";
+    scoreText = "text-[#fbbc05] dark:text-[#ffd54f]";
   }
 
   // Circular progress calculations: radius=42, circumference = 2 * PI * 42 = 263.89
@@ -219,38 +219,31 @@ export default function ResultsPage() {
   // Recharts target data
   const chartData = [
     { name: "Your score", score: score, fill: scoreColor },
-    { name: "Recruiter standard", score: 80, fill: "#6366f1" },
+    { name: "Baseline standard", score: 80, fill: "#1a73e8" },
   ];
 
   // Dynamic interview questions
   const computedQuestions = getInterviewQuestions(inferredRole, data.missing_critical_skills);
 
   return (
-    <div className={`relative min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-300 ${
-      isDark ? "bg-[#0f0f13] text-zinc-150 font-sans" : "bg-[#fcfcfe] text-zinc-800 font-sans"
+    <div className={`relative min-h-screen flex flex-col justify-between overflow-x-hidden transition-colors duration-250 ${
+      isDark ? "bg-[#202124] text-[#e8eaed] font-sans" : "bg-[#f8f9fa] text-[#3c4043] font-sans"
     }`}>
-      {/* Decorative Orbs */}
-      {isDark && (
-        <>
-          <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-violet-600/5 blur-[120px] pointer-events-none animate-pulse" />
-          <div className="absolute bottom-[10%] left-[-15%] w-[600px] h-[600px] rounded-full bg-indigo-600/5 blur-[120px] pointer-events-none animate-pulse" />
-        </>
-      )}
-
+      
       {/* Top Navbar */}
-      <header className={`border-b sticky top-0 z-50 backdrop-blur-lg transition-colors no-print ${
-        isDark ? "border-zinc-800/80 bg-zinc-950/60" : "border-zinc-200/80 bg-white/70 shadow-sm"
+      <header className={`border-b sticky top-0 z-50 backdrop-blur-md transition-colors no-print ${
+        isDark ? "border-[#3c4043] bg-[#202124]/90" : "border-[#dadce0] bg-white/90 shadow-sm"
       }`}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div
             className="flex items-center gap-2.5 cursor-pointer"
             onClick={() => router.push("/")}
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center font-bold text-white shadow-md shadow-violet-500/20">
-              AI
+            <div className="w-8 h-8 rounded-lg bg-[#1a73e8] flex items-center justify-center font-bold text-white shadow-sm">
+              G
             </div>
-            <span className={`text-md md:text-lg font-extrabold tracking-tight ${
-              isDark ? "bg-gradient-to-r from-violet-400 to-indigo-300 bg-clip-text text-transparent" : "text-zinc-900"
+            <span className={`text-md font-bold tracking-tight ${
+              isDark ? "text-white" : "text-[#202124]"
             }`}>
               AI Placement Readiness Platform
             </span>
@@ -262,17 +255,17 @@ export default function ResultsPage() {
               onClick={toggleTheme}
               className={`p-2 rounded-lg transition-colors border ${
                 isDark
-                  ? "bg-zinc-900/60 border-zinc-800 text-amber-400 hover:bg-zinc-800"
-                  : "bg-zinc-100 border-zinc-200 text-zinc-700 hover:bg-zinc-200"
+                  ? "bg-[#2d2d30] border-[#3c4043] text-amber-400 hover:bg-[#3c4043]"
+                  : "bg-white border-[#dadce0] text-zinc-700 hover:bg-zinc-100 shadow-sm"
               }`}
               title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
               {isDark ? (
-                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
                 </svg>
               ) : (
-                <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
@@ -281,10 +274,10 @@ export default function ResultsPage() {
             {/* Print Trigger */}
             <button
               onClick={handlePrint}
-              className={`text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg border transition ${
+              className={`text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full border transition ${
                 isDark
-                  ? "bg-violet-600/10 border-violet-500/20 text-violet-400 hover:bg-violet-600 hover:text-white"
-                  : "bg-violet-50 border-violet-200 text-violet-650 hover:bg-violet-600 hover:text-white"
+                  ? "bg-[#2d2d30] border-[#3c4043] text-[#8ab4f8] hover:bg-[#3c4043] hover:text-white"
+                  : "bg-white border-[#dadce0] text-[#1a73e8] hover:bg-zinc-100 shadow-sm"
               }`}
             >
               🖨 Print
@@ -293,8 +286,8 @@ export default function ResultsPage() {
             {/* Back Home */}
             <button
               onClick={() => router.push("/")}
-              className={`text-xs font-semibold px-4 py-2.5 rounded-lg border transition ${
-                isDark ? "bg-zinc-900 border-zinc-800 hover:bg-zinc-850 text-zinc-300" : "bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-700 shadow-sm"
+              className={`text-xs font-bold px-4 py-2.5 rounded-full border transition ${
+                isDark ? "bg-[#2d2d30] border-[#3c4043] hover:bg-[#3c4043] text-zinc-300" : "bg-white border-[#dadce0] hover:bg-zinc-50 text-[#3c4043] shadow-sm"
               }`}
             >
               ← Terminals
@@ -308,26 +301,26 @@ export default function ResultsPage() {
         
         {/* EXECUTIVE INTRO HEADER BLOCK */}
         <section className={`border rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 print-card ${
-          isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+          isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
         }`}>
           <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-extrabold tracking-widest uppercase border bg-violet-600/10 border-violet-500/35 text-violet-400 mb-3">
-              Recruitment Screening telemetry
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[9px] font-bold tracking-wider border bg-[#1a73e8]/5 dark:bg-[#1a73e8]/10 border-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] mb-3">
+              Placement Telemetry Scorecard
             </span>
-            <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${isDark ? "text-white" : "text-zinc-950"}`}>
-              Placement Readiness Scorecard
+            <h1 className={`text-2xl md:text-3xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#202124]"}`}>
+              Placement Readiness Evaluation
             </h1>
-            <p className={`text-xs mt-1.5 max-w-xl leading-relaxed ${isDark ? "text-zinc-400" : "text-zinc-600"}`}>
-              Calculated for the targeted profile **{inferredRole}**. Formulated by weighing critical framework requirements against public active repository footprints.
+            <p className={`text-xs mt-1.5 max-w-xl leading-relaxed ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
+              Target Role: **{inferredRole}**. Calculated by analyzing technical credentials alongside public software indices.
             </p>
           </div>
 
           <div className="flex items-center gap-4 shrink-0">
             <button
               onClick={handlePrint}
-              className="bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl shadow-md shadow-violet-500/10 hover:shadow-violet-500/20 active:scale-98 transition-all flex items-center gap-2 no-print"
+              className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full shadow-sm hover:shadow active:scale-98 transition-all flex items-center gap-2 no-print"
             >
-              📥 Download PDF Report
+              📥 Download Report PDF
             </button>
           </div>
         </section>
@@ -337,10 +330,10 @@ export default function ResultsPage() {
           
           {/* Left panel: Circular progress */}
           <div className={`lg:col-span-4 border rounded-2xl p-6 flex flex-col items-center justify-center print-card ${
-            isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+            isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
           }`}>
-            <h3 className={`text-xs font-extrabold uppercase tracking-widest mb-6 ${isDark ? "text-zinc-450" : "text-zinc-500"}`}>
-              Assessment score
+            <h3 className={`text-xs font-bold uppercase tracking-wider mb-6 ${isDark ? "text-zinc-450" : "text-[#5f6368]"}`}>
+              Assessment Score Index
             </h3>
             
             <div className="relative w-36 h-36">
@@ -350,7 +343,7 @@ export default function ResultsPage() {
                   cy="72"
                   r="42"
                   stroke={isDark ? "#1f1f23" : "#e4e4e7"}
-                  strokeWidth="7"
+                  strokeWidth="6"
                   fill="transparent"
                 />
                 <circle
@@ -358,7 +351,7 @@ export default function ResultsPage() {
                   cy="72"
                   r="42"
                   stroke={scoreColor}
-                  strokeWidth="7"
+                  strokeWidth="6"
                   fill="transparent"
                   strokeDasharray={circ}
                   strokeDashoffset={strokeOffset}
@@ -367,51 +360,51 @@ export default function ResultsPage() {
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className={`text-3xl font-black ${isDark ? "text-white" : "text-zinc-900"}`}>{score}</span>
-                <span className={`text-[8px] tracking-wider font-extrabold uppercase ${isDark ? "text-zinc-500" : "text-zinc-450"}`}>
+                <span className={`text-3xl font-extrabold ${isDark ? "text-white" : "text-[#202124]"}`}>{score}</span>
+                <span className={`text-[8px] tracking-wider font-bold uppercase ${isDark ? "text-zinc-500" : "text-[#5f6368]"}`}>
                   INDEX
                 </span>
               </div>
             </div>
 
-            <span className={`mt-5 px-3.5 py-1 rounded-full text-[10px] font-extrabold tracking-widest uppercase border ${scoreBg} ${scoreBorder} ${scoreText}`}>
+            <span className={`mt-5 px-3.5 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase border ${scoreBg} ${scoreBorder} ${scoreText}`}>
               {data.readiness_label}
             </span>
           </div>
 
           {/* Right panel: Executive Insights */}
           <div className={`lg:col-span-8 border rounded-2xl p-6 md:p-8 flex flex-col gap-6 print-card ${
-            isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+            isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
           }`}>
-            <h3 className={`text-xs font-extrabold uppercase tracking-widest ${isDark ? "text-zinc-400" : "text-zinc-550"}`}>
-              Executive Screening highlights
+            <h3 className={`text-xs font-bold uppercase tracking-wider ${isDark ? "text-zinc-400" : "text-[#5f6368]"}`}>
+              Assessment Highlights
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-violet-400 mb-1.5">
-                  📄 Resume Evaluation
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] dark:text-[#8ab4f8] mb-1.5">
+                  📄 Credential Audit
                 </h4>
-                <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-300" : "text-zinc-650"}`}>
+                <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-300" : "text-[#5f6368]"}`}>
                   {data.resume_summary}
                 </p>
               </div>
 
               <div>
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-violet-400 mb-1.5">
-                  💻 GitHub active footprints
+                <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#34a853] dark:text-[#81c784] mb-1.5">
+                  💻 Verification Indices
                 </h4>
-                <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-300" : "text-zinc-650"}`}>
+                <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-300" : "text-[#5f6368]"}`}>
                   {data.github_summary}
                 </p>
               </div>
             </div>
 
             <div className={`border-t pt-4 flex flex-col sm:flex-row gap-2 sm:items-center justify-between text-[10px] leading-relaxed italic ${
-              isDark ? "border-zinc-850 text-zinc-450" : "border-zinc-150 text-zinc-500"
+              isDark ? "border-[#3c4043] text-zinc-500" : "border-[#dadce0] text-zinc-450"
             }`}>
-              <span>Verified under Gemini 2.5 Flash analysis pipelines</span>
-              <span>Compiled: {new Date().toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
+              <span>Verified using advanced placement analytics.</span>
+              <span>Date: {new Date().toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
             </div>
           </div>
         </section>
@@ -421,56 +414,56 @@ export default function ResultsPage() {
           
           {/* Left panel: Have vs Need */}
           <div className={`lg:col-span-7 border rounded-2xl p-6 flex flex-col justify-between print-card ${
-            isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+            isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
           }`}>
             <div>
-              <h3 className={`text-xs font-extrabold uppercase tracking-widest mb-5 ${isDark ? "text-zinc-450" : "text-zinc-550"}`}>
-                Skill Vector Gaps
+              <h3 className={`text-xs font-bold uppercase tracking-wider mb-5 ${isDark ? "text-zinc-450" : "text-[#5f6368]"}`}>
+                Analyzed Skill Matrix
               </h3>
 
               <div className="space-y-4">
-                <div className={`border rounded-xl p-4 ${isDark ? "bg-zinc-950/20 border-zinc-850" : "bg-zinc-50 border-zinc-150"}`}>
-                  <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                    <span>✓</span> Verified Capabilities
+                <div className={`border rounded-xl p-4 ${isDark ? "bg-[#202124]/40 border-[#3c4043]" : "bg-[#f8f9fa] border-[#dadce0]"}`}>
+                  <h4 className="text-[10px] font-bold text-[#34a853] dark:text-[#81c784] uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                    <span>✓</span> Verified Core Competencies
                   </h4>
                   <div className="flex flex-wrap gap-1.5">
                     {data.matched_skills.map((sk, idx) => (
                       <span
                         key={idx}
-                        className="text-[10px] font-semibold px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/15 text-emerald-400"
+                        className="text-[10px] font-semibold px-2.5 py-1 rounded bg-[#34a853]/10 border border-[#34a853]/15 text-[#34a853]"
                       >
                         {sk}
                       </span>
                     ))}
                     {data.matched_skills.length === 0 && (
-                      <span className="text-[10px] text-zinc-500 italic">No matching keywords isolated.</span>
+                      <span className="text-[10px] text-zinc-500 italic">No matching indices isolated.</span>
                     )}
                   </div>
                 </div>
 
-                <div className={`border rounded-xl p-4 ${isDark ? "bg-zinc-950/20 border-zinc-850" : "bg-zinc-50 border-zinc-150"}`}>
-                  <h4 className="text-[10px] font-bold text-red-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                    <span>⚠️</span> Deficient Targets
+                <div className={`border rounded-xl p-4 ${isDark ? "bg-[#202124]/40 border-[#3c4043]" : "bg-[#f8f9fa] border-[#dadce0]"}`}>
+                  <h4 className="text-[10px] font-bold text-[#ea4335] dark:text-[#e57373] uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                    <span>⚠️</span> Identified Skill Deficiencies
                   </h4>
                   <div className="flex flex-wrap gap-1.5">
                     {data.missing_critical_skills.map((sk, idx) => (
                       <span
                         key={`crit-${idx}`}
-                        className="text-[10px] font-semibold px-2.5 py-1 rounded bg-red-500/10 border border-red-500/15 text-red-400"
+                        className="text-[10px] font-semibold px-2.5 py-1 rounded bg-[#ea4335]/10 border border-[#ea4335]/15 text-[#ea4335]"
                       >
-                        {sk} (Must-Have)
+                        {sk} (Required)
                       </span>
                     ))}
                     {data.missing_nice_to_have.map((sk, idx) => (
                       <span
                         key={`nice-${idx}`}
-                        className="text-[10px] font-semibold px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/15 text-amber-400"
+                        className="text-[10px] font-semibold px-2.5 py-1 rounded bg-[#fbbc05]/10 border border-[#fbbc05]/15 text-[#fbbc05] dark:text-[#ffd54f]"
                       >
-                        {sk} (Nice-To-Have)
+                        {sk} (Recommended)
                       </span>
                     ))}
                     {data.missing_critical_skills.length === 0 && data.missing_nice_to_have.length === 0 && (
-                      <span className="text-[10px] text-zinc-500 italic">Zero skill gaps discovered. Fully aligned.</span>
+                      <span className="text-[10px] text-zinc-500 italic">Skill matrix aligned. Deficiencies not detected.</span>
                     )}
                   </div>
                 </div>
@@ -478,17 +471,17 @@ export default function ResultsPage() {
             </div>
 
             <p className={`text-[10px] italic mt-4 ${isDark ? "text-zinc-500" : "text-zinc-450"}`}>
-              * Deficient targets should remain focus areas inside priority suggestion logs.
+              * Skill gaps should occupy prioritized roadmap schedules.
             </p>
           </div>
 
           {/* Right panel: Recharts Histogram */}
           <div className={`lg:col-span-5 border rounded-2xl p-6 flex flex-col justify-between print-card ${
-            isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+            isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
           }`}>
             <div>
-              <h3 className={`text-xs font-extrabold uppercase tracking-widest mb-5 ${isDark ? "text-zinc-450" : "text-zinc-550"}`}>
-                Recruiter Baseline Index
+              <h3 className={`text-xs font-bold uppercase tracking-wider mb-5 ${isDark ? "text-zinc-450" : "text-[#5f6368]"}`}>
+                Industry Baseline Comparison
               </h3>
               
               <div className="w-full h-40">
@@ -499,16 +492,16 @@ export default function ResultsPage() {
                       data={chartData}
                       margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
                     >
-                      <XAxis type="number" domain={[0, 100]} stroke={isDark ? "#3f3f46" : "#a1a1aa"} style={{ fontSize: 10 }} />
-                      <YAxis dataKey="name" type="category" stroke={isDark ? "#3f3f46" : "#a1a1aa"} width={80} style={{ fontSize: 9 }} />
+                      <XAxis type="number" domain={[0, 100]} stroke={isDark ? "#5f6368" : "#dadce0"} style={{ fontSize: 10 }} />
+                      <YAxis dataKey="name" type="category" stroke={isDark ? "#5f6368" : "#dadce0"} width={80} style={{ fontSize: 9 }} />
                       <Tooltip
                         cursor={{ fill: "transparent" }}
                         contentStyle={{
-                          backgroundColor: isDark ? "#18181b" : "#ffffff",
-                          borderColor: isDark ? "#27272a" : "#e4e4e7",
+                          backgroundColor: isDark ? "#2d2d30" : "#ffffff",
+                          borderColor: isDark ? "#3c4043" : "#dadce0",
                           borderRadius: "8px",
                           fontSize: 11,
-                          color: isDark ? "#f3f4f6" : "#09090b",
+                          color: isDark ? "#e8eaed" : "#202124",
                         }}
                       />
                       <Bar dataKey="score" radius={[0, 4, 4, 0]} barSize={16}>
@@ -520,14 +513,14 @@ export default function ResultsPage() {
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-zinc-500 text-[10px]">
-                    Constructing metric indexes...
+                    Structuring indicators...
                   </div>
                 )}
               </div>
             </div>
 
             <p className={`text-[10px] leading-relaxed ${isDark ? "text-zinc-500" : "text-zinc-450"}`}>
-              Standard recruitment benchmark sits at **80 points**. Scores lower than 70 points indicate gaps requiring mitigation prior to hiring screens.
+              Optimal baseline baseline benchmark lies at **80 points**. Deficit markers suggest specific study focuses prior to applying.
             </p>
           </div>
         </section>
@@ -536,16 +529,16 @@ export default function ResultsPage() {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Strengths Card */}
           <div className={`border rounded-2xl p-6 print-card ${
-            isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+            isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
           }`}>
-            <h3 className="text-xs font-extrabold uppercase tracking-widest text-emerald-400 mb-4 flex items-center gap-1.5">
-              <span>🚀</span> Competitive Strengths
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#34a853] dark:text-[#81c784] mb-4 flex items-center gap-1.5">
+              <span>🚀</span> Key Professional Strengths
             </h3>
             <ul className="space-y-3.5">
               {data.strengths.map((str, idx) => (
                 <li key={idx} className="flex items-start gap-2.5">
-                  <span className="text-emerald-500 font-bold shrink-0 text-xs">•</span>
-                  <span className={`text-xs leading-relaxed ${isDark ? "text-zinc-350" : "text-zinc-700"}`}>{str}</span>
+                  <span className="text-[#34a853] font-bold shrink-0 text-xs">•</span>
+                  <span className={`text-xs leading-relaxed ${isDark ? "text-zinc-350" : "text-[#5f6368]"}`}>{str}</span>
                 </li>
               ))}
               {data.strengths.length === 0 && (
@@ -556,140 +549,140 @@ export default function ResultsPage() {
 
           {/* Weaknesses Card */}
           <div className={`border rounded-2xl p-6 print-card ${
-            isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+            isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
           }`}>
-            <h3 className="text-xs font-extrabold uppercase tracking-widest text-red-400 mb-4 flex items-center gap-1.5">
-              <span>⚠️</span> Deficit Checkpoints
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#ea4335] dark:text-[#e57373] mb-4 flex items-center gap-1.5">
+              <span>⚠️</span> Target Growth deficts
             </h3>
             <ul className="space-y-3.5">
               {data.weaknesses.map((weak, idx) => (
                 <li key={idx} className="flex items-start gap-2.5">
-                  <span className="text-red-500 font-bold shrink-0 text-xs">•</span>
-                  <span className={`text-xs leading-relaxed ${isDark ? "text-zinc-350" : "text-zinc-700"}`}>{weak}</span>
+                  <span className="text-[#ea4335] font-bold shrink-0 text-xs">•</span>
+                  <span className={`text-xs leading-relaxed ${isDark ? "text-zinc-350" : "text-[#5f6368]"}`}>{weak}</span>
                 </li>
               ))}
               {data.weaknesses.length === 0 && (
-                <li className="text-xs text-zinc-500 italic">No structural weaknesses reported.</li>
+                <li className="text-xs text-zinc-500 italic">No structural deficts identified.</li>
               )}
             </ul>
           </div>
         </section>
 
-        {/* SECTION 4: PRIORITY MITIGATION RECOMMENDATIONS */}
+        {/* SECTION 4: PRIORITY RECOMMENDED LEARNING PATHS */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {data.top_3_priorities.slice(0, 3).map((item, idx) => (
             <div
               key={idx}
               className={`border rounded-2xl p-6 flex flex-col justify-between print-card ${
-                isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+                isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
               }`}
             >
               <div>
-                <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-black mb-4 ${
-                  isDark ? "bg-violet-500/10 text-violet-400 border border-violet-500/20" : "bg-violet-50 text-violet-600 border border-violet-100"
+                <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-bold mb-4 ${
+                  isDark ? "bg-[#1a73e8]/10 text-[#8ab4f8] border border-[#1a73e8]/20" : "bg-[#1a73e8]/5 text-[#1a73e8] border border-[#1a73e8]/10"
                 }`}>
                   0{idx + 1}
                 </span>
-                <h3 className={`text-md font-bold mb-2 ${isDark ? "text-white" : "text-zinc-900"}`}>{item.skill}</h3>
-                <p className={`text-xs leading-relaxed mb-6 ${isDark ? "text-zinc-400" : "text-zinc-600"}`}>
+                <h3 className={`text-md font-bold mb-2 ${isDark ? "text-white" : "text-[#202124]"}`}>{item.skill}</h3>
+                <p className={`text-xs leading-relaxed mb-6 ${isDark ? "text-zinc-400" : "text-[#5f6368]"}`}>
                   {item.reason}
                 </p>
               </div>
 
               <div className={`pt-3.5 border-t text-[10px] flex items-center gap-1.5 font-mono ${
-                isDark ? "border-zinc-850 text-violet-400" : "border-zinc-150 text-violet-600"
+                isDark ? "border-[#3c4043] text-[#8ab4f8]" : "border-[#dadce0] text-[#1a73e8]"
               }`}>
-                <span className="font-bold uppercase tracking-wider shrink-0 text-zinc-500">Resource:</span>
+                <span className="font-bold uppercase tracking-wider shrink-0 text-zinc-550">Resource:</span>
                 <span className="truncate" title={item.resource}>{item.resource}</span>
               </div>
             </div>
           ))}
         </section>
 
-        {/* SECTION 5: LEARNING ROADMAP (SCREEN TABS & PRINT LISTING) */}
+        {/* SECTION 5: SKILL ROADMAP TABS */}
         <section className={`border rounded-2xl p-6 md:p-8 print-card ${
-          isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+          isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
         }`}>
-          <h2 className={`text-lg font-bold mb-6 flex items-center gap-2 ${isDark ? "text-white" : "text-zinc-950"}`}>
-            <span className="text-violet-500">03</span> Learning & Skill Mitigation Roadmap
+          <h2 className={`text-lg font-bold mb-6 flex items-center gap-2 ${isDark ? "text-white" : "text-[#202124]"}`}>
+            <span className="text-[#1a73e8] dark:text-[#8ab4f8]">03</span> Learning & Strategic Roadmap
           </h2>
 
           {/* Tab buttons - Hidden in Print */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6 border-b pb-4 border-zinc-800/20 no-print">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6 border-b pb-4 border-[#dadce0] dark:border-[#3c4043] no-print">
             <button
               onClick={() => setActiveRoadmapTab("week_1_2")}
-              className={`py-3 px-4 rounded-xl text-[10px] font-bold uppercase tracking-wider transition ${
+              className={`py-3 px-4 rounded-full text-[10px] font-bold uppercase tracking-wider transition ${
                 activeRoadmapTab === "week_1_2"
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-500/10"
+                  ? "bg-[#1a73e8] text-white shadow-sm"
                   : isDark
-                  ? "bg-zinc-950/20 text-zinc-500 border border-zinc-850 hover:text-zinc-300"
-                  : "bg-zinc-100 text-zinc-500 border border-zinc-200 hover:text-zinc-700"
+                  ? "bg-[#202124] text-zinc-400 border border-[#3c4043] hover:text-white"
+                  : "bg-white text-zinc-650 border border-[#dadce0] hover:text-zinc-900 shadow-sm"
               }`}
             >
               Weeks 1-2
             </button>
             <button
               onClick={() => setActiveRoadmapTab("month_1")}
-              className={`py-3 px-4 rounded-xl text-[10px] font-bold uppercase tracking-wider transition ${
+              className={`py-3 px-4 rounded-full text-[10px] font-bold uppercase tracking-wider transition ${
                 activeRoadmapTab === "month_1"
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-500/10"
+                  ? "bg-[#1a73e8] text-white shadow-sm"
                   : isDark
-                  ? "bg-zinc-950/20 text-zinc-500 border border-zinc-850 hover:text-zinc-300"
-                  : "bg-zinc-100 text-zinc-500 border border-zinc-200 hover:text-zinc-700"
+                  ? "bg-[#202124] text-zinc-400 border border-[#3c4043] hover:text-white"
+                  : "bg-white text-zinc-655 border border-[#dadce0] hover:text-zinc-900 shadow-sm"
               }`}
             >
               Month 1
             </button>
             <button
               onClick={() => setActiveRoadmapTab("month_2")}
-              className={`py-3 px-4 rounded-xl text-[10px] font-bold uppercase tracking-wider transition ${
+              className={`py-3 px-4 rounded-full text-[10px] font-bold uppercase tracking-wider transition ${
                 activeRoadmapTab === "month_2"
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-500/10"
+                  ? "bg-[#1a73e8] text-white shadow-sm"
                   : isDark
-                  ? "bg-zinc-950/20 text-zinc-500 border border-zinc-850 hover:text-zinc-300"
-                  : "bg-zinc-100 text-zinc-500 border border-zinc-200 hover:text-zinc-700"
+                  ? "bg-[#202124] text-zinc-400 border border-[#3c4043] hover:text-white"
+                  : "bg-white text-zinc-655 border border-[#dadce0] hover:text-zinc-900 shadow-sm"
               }`}
             >
               Month 2
             </button>
             <button
               onClick={() => setActiveRoadmapTab("month_3")}
-              className={`py-3 px-4 rounded-xl text-[10px] font-bold uppercase tracking-wider transition ${
+              className={`py-3 px-4 rounded-full text-[10px] font-bold uppercase tracking-wider transition ${
                 activeRoadmapTab === "month_3"
-                  ? "bg-violet-600 text-white shadow-md shadow-violet-500/10"
+                  ? "bg-[#1a73e8] text-white shadow-sm"
                   : isDark
-                  ? "bg-zinc-950/20 text-zinc-500 border border-zinc-850 hover:text-zinc-300"
-                  : "bg-zinc-100 text-zinc-500 border border-zinc-200 hover:text-zinc-700"
+                  ? "bg-[#202124] text-zinc-400 border border-[#3c4043] hover:text-white"
+                  : "bg-white text-zinc-655 border border-[#dadce0] hover:text-zinc-900 shadow-sm"
               }`}
             >
               Month 3
             </button>
           </div>
 
-          {/* Dashboard Tab Content - Rendered for screen */}
+          {/* Dashboard Tab Content - Screen */}
           <div className="no-print">
             <div className={`border rounded-xl p-5 md:p-6 transition-all duration-300 ${
-              isDark ? "bg-zinc-950/20 border-zinc-850" : "bg-zinc-50 border-zinc-150"
+              isDark ? "bg-[#202124]/40 border-[#3c4043]" : "bg-[#f8f9fa] border-[#dadce0]"
             }`}>
               {activeRoadmapTab === "week_1_2" && data.roadmap.week_1_2 && (
                 <div>
-                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b ${isDark ? "border-zinc-850" : "border-zinc-200"}`}>
+                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b ${isDark ? "border-[#3c4043]" : "border-[#dadce0]"}`}>
                     <div>
-                      <span className={`text-[9px] tracking-widest font-extrabold uppercase block ${isDark ? "text-zinc-500" : "text-zinc-450"}`}>
-                        Initial onboarding block
+                      <span className={`text-[9px] tracking-widest font-bold uppercase block ${isDark ? "text-zinc-500" : "text-[#5f6368]"}`}>
+                        Onboarding targets
                       </span>
-                      <h3 className={`text-md font-bold mt-0.5 ${isDark ? "text-white" : "text-zinc-950"}`}>
+                      <h3 className={`text-md font-bold mt-0.5 ${isDark ? "text-white" : "text-[#202124]"}`}>
                         {data.roadmap.week_1_2.focus}
                       </h3>
                     </div>
-                    <div className="bg-violet-500/15 border border-violet-500/20 text-violet-400 text-[10px] font-bold py-1.5 px-3 rounded shrink-0 w-fit">
-                      ⏰ {data.roadmap.week_1_2.hours_per_day} hours/day targeted
+                    <div className="bg-[#1a73e8]/10 border border-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] text-[10px] font-bold py-1.5 px-3 rounded-full shrink-0 w-fit">
+                      ⏰ {data.roadmap.week_1_2.hours_per_day} hours/day study guide
                     </div>
                   </div>
                   <ul className="space-y-3">
                     {data.roadmap.week_1_2.tasks.map((task, i) => (
-                      <li key={i} className={`text-xs flex items-start gap-2.5 ${isDark ? "text-zinc-300" : "text-zinc-705"}`}>
-                        <span className="text-violet-500 mt-1 shrink-0">•</span>
+                      <li key={i} className={`text-xs flex items-start gap-2.5 ${isDark ? "text-zinc-300" : "text-[#3c4043]"}`}>
+                        <span className="text-[#1a73e8] mt-1 shrink-0">•</span>
                         <span>{task}</span>
                       </li>
                     ))}
@@ -699,23 +692,23 @@ export default function ResultsPage() {
 
               {activeRoadmapTab === "month_1" && data.roadmap.month_1 && (
                 <div>
-                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b ${isDark ? "border-zinc-850" : "border-zinc-200"}`}>
+                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b ${isDark ? "border-[#3c4043]" : "border-[#dadce0]"}`}>
                     <div>
-                      <span className={`text-[9px] tracking-widest font-extrabold uppercase block ${isDark ? "text-zinc-500" : "text-zinc-450"}`}>
-                        Milestone cycle 01
+                      <span className={`text-[9px] tracking-widest font-bold uppercase block ${isDark ? "text-zinc-500" : "text-[#5f6368]"}`}>
+                        First month goals
                       </span>
-                      <h3 className={`text-md font-bold mt-0.5 ${isDark ? "text-white" : "text-zinc-950"}`}>
+                      <h3 className={`text-md font-bold mt-0.5 ${isDark ? "text-white" : "text-[#202124]"}`}>
                         {data.roadmap.month_1.focus}
                       </h3>
                     </div>
-                    <div className="bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold py-1.5 px-3 rounded shrink-0 w-fit">
+                    <div className="bg-[#34a853]/10 border border-[#34a853]/20 text-[#34a853] dark:text-[#81c784] text-[10px] font-bold py-1.5 px-3 rounded-full shrink-0 w-fit">
                       🎯 Milestone: {data.roadmap.month_1.milestone}
                     </div>
                   </div>
                   <ul className="space-y-3">
                     {data.roadmap.month_1.tasks.map((task, i) => (
-                      <li key={i} className={`text-xs flex items-start gap-2.5 ${isDark ? "text-zinc-300" : "text-zinc-705"}`}>
-                        <span className="text-violet-500 mt-1 shrink-0">•</span>
+                      <li key={i} className={`text-xs flex items-start gap-2.5 ${isDark ? "text-zinc-300" : "text-[#3c4043]"}`}>
+                        <span className="text-[#1a73e8] mt-1 shrink-0">•</span>
                         <span>{task}</span>
                       </li>
                     ))}
@@ -725,23 +718,23 @@ export default function ResultsPage() {
 
               {activeRoadmapTab === "month_2" && data.roadmap.month_2 && (
                 <div>
-                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b ${isDark ? "border-zinc-850" : "border-zinc-200"}`}>
+                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b ${isDark ? "border-[#3c4043]" : "border-[#dadce0]"}`}>
                     <div>
-                      <span className={`text-[9px] tracking-widest font-extrabold uppercase block ${isDark ? "text-zinc-500" : "text-zinc-450"}`}>
-                        Milestone cycle 02
+                      <span className={`text-[9px] tracking-widest font-bold uppercase block ${isDark ? "text-zinc-500" : "text-[#5f6368]"}`}>
+                        Second month goals
                       </span>
-                      <h3 className={`text-md font-bold mt-0.5 ${isDark ? "text-white" : "text-zinc-950"}`}>
+                      <h3 className={`text-md font-bold mt-0.5 ${isDark ? "text-white" : "text-[#202124]"}`}>
                         {data.roadmap.month_2.focus}
                       </h3>
                     </div>
-                    <div className="bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold py-1.5 px-3 rounded shrink-0 w-fit">
+                    <div className="bg-[#34a853]/10 border border-[#34a853]/20 text-[#34a853] dark:text-[#81c784] text-[10px] font-bold py-1.5 px-3 rounded-full shrink-0 w-fit">
                       🎯 Milestone: {data.roadmap.month_2.milestone}
                     </div>
                   </div>
                   <ul className="space-y-3">
                     {data.roadmap.month_2.tasks.map((task, i) => (
-                      <li key={i} className={`text-xs flex items-start gap-2.5 ${isDark ? "text-zinc-300" : "text-zinc-705"}`}>
-                        <span className="text-violet-500 mt-1 shrink-0">•</span>
+                      <li key={i} className={`text-xs flex items-start gap-2.5 ${isDark ? "text-zinc-300" : "text-[#3c4043]"}`}>
+                        <span className="text-[#1a73e8] mt-1 shrink-0">•</span>
                         <span>{task}</span>
                       </li>
                     ))}
@@ -751,23 +744,23 @@ export default function ResultsPage() {
 
               {activeRoadmapTab === "month_3" && data.roadmap.month_3 && (
                 <div>
-                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b ${isDark ? "border-zinc-850" : "border-zinc-200"}`}>
+                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b ${isDark ? "border-[#3c4043]" : "border-[#dadce0]"}`}>
                     <div>
-                      <span className={`text-[9px] tracking-widest font-extrabold uppercase block ${isDark ? "text-zinc-500" : "text-zinc-450"}`}>
-                        Milestone cycle 03
+                      <span className={`text-[9px] tracking-widest font-bold uppercase block ${isDark ? "text-zinc-500" : "text-[#5f6368]"}`}>
+                        Third month goals
                       </span>
-                      <h3 className={`text-md font-bold mt-0.5 ${isDark ? "text-white" : "text-zinc-950"}`}>
+                      <h3 className={`text-md font-bold mt-0.5 ${isDark ? "text-white" : "text-[#202124]"}`}>
                         {data.roadmap.month_3.focus}
                       </h3>
                     </div>
-                    <div className="bg-emerald-500/15 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold py-1.5 px-3 rounded shrink-0 w-fit">
+                    <div className="bg-[#34a853]/10 border border-[#34a853]/20 text-[#34a853] dark:text-[#81c784] text-[10px] font-bold py-1.5 px-3 rounded-full shrink-0 w-fit">
                       🎯 Milestone: {data.roadmap.month_3.milestone}
                     </div>
                   </div>
                   <ul className="space-y-3">
                     {data.roadmap.month_3.tasks.map((task, i) => (
-                      <li key={i} className={`text-xs flex items-start gap-2.5 ${isDark ? "text-zinc-300" : "text-zinc-705"}`}>
-                        <span className="text-violet-500 mt-1 shrink-0">•</span>
+                      <li key={i} className={`text-xs flex items-start gap-2.5 ${isDark ? "text-zinc-300" : "text-[#3c4043]"}`}>
+                        <span className="text-[#1a73e8] mt-1 shrink-0">•</span>
                         <span>{task}</span>
                       </li>
                     ))}
@@ -777,7 +770,7 @@ export default function ResultsPage() {
             </div>
           </div>
 
-          {/* Sequential layout - Rendered for dynamic PDF layout printing */}
+          {/* Sequential roadmap - Dynamic print PDF styling */}
           <div className="hidden roadmap-print-all space-y-6">
             <div className="roadmap-tab-panel">
               <h4 className="text-xs font-bold uppercase tracking-wider mb-2">Weeks 1-2 Focus: {data.roadmap.week_1_2?.focus}</h4>
@@ -814,19 +807,19 @@ export default function ResultsPage() {
           </div>
         </section>
 
-        {/* SECTION 6: INTERVIEW PREPARATION MODULE (NEWLY IMPLEMENTED) */}
+        {/* SECTION 6: INTERVIEW PREPARATION MODULE */}
         <section className={`border rounded-2xl p-6 md:p-8 print-card ${
-          isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+          isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
         }`}>
           <div className="mb-6">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded text-[9px] font-extrabold tracking-widest uppercase border bg-violet-600/10 border-violet-500/35 text-violet-400 mb-3">
-              Recruiter screening simulator
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[9px] font-bold tracking-wider border bg-[#1a73e8]/5 dark:bg-[#1a73e8]/10 border-[#1a73e8]/20 text-[#1a73e8] dark:text-[#8ab4f8] mb-3">
+              Assessment Prep Simulator
             </span>
-            <h2 className={`text-lg font-bold flex items-center gap-2 ${isDark ? "text-white" : "text-zinc-950"}`}>
-              🎯 Recommended Interview Questions
+            <h2 className={`text-lg font-bold flex items-center gap-2 ${isDark ? "text-white" : "text-[#202124]"}`}>
+              🎯 Targeted Interview Preparation Questions
             </h2>
-            <p className={`text-xs mt-1.5 ${isDark ? "text-zinc-400" : "text-zinc-550"}`}>
-              Custom behavioral and algorithm prompts formed to challenge your specific missing requirements.
+            <p className={`text-xs mt-1.5 ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
+              Custom software engineering screening prompts generated to test your specific deficiency gap categories.
             </p>
           </div>
 
@@ -835,49 +828,49 @@ export default function ResultsPage() {
               <div
                 key={idx}
                 className={`border rounded-xl p-5 flex flex-col justify-between ${
-                  isDark ? "bg-zinc-950/25 border-zinc-850" : "bg-zinc-50 border-zinc-150 shadow-sm"
+                  isDark ? "bg-[#202124]/40 border-[#3c4043]" : "bg-[#f8f9fa] border-[#dadce0] shadow-sm"
                 }`}
               >
                 <div className="mb-4">
-                  <span className={`text-[8px] font-bold border px-1.5 py-0.5 rounded uppercase tracking-widest ${
-                    isDark ? "bg-zinc-900 text-violet-400 border-zinc-800" : "bg-violet-50 text-violet-600 border-violet-100"
+                  <span className={`text-[8px] font-bold border px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                    isDark ? "bg-zinc-800 text-[#8ab4f8] border-zinc-700" : "bg-[#1a73e8]/5 text-[#1a73e8] border-[#1a73e8]/10"
                   }`}>
                     {qObj.category}
                   </span>
-                  <p className={`text-xs leading-relaxed font-medium mt-3 ${isDark ? "text-zinc-200" : "text-zinc-800"}`}>
+                  <p className={`text-xs leading-relaxed font-bold mt-3 ${isDark ? "text-zinc-200" : "text-[#202124]"}`}>
                     "{qObj.q}"
                   </p>
                 </div>
-                <div className={`pt-3 border-t text-[9px] ${isDark ? "border-zinc-850 text-zinc-500" : "border-zinc-200 text-zinc-450"}`}>
-                  * Practice constructing a structured STAR-framework response.
+                <div className={`pt-3 border-t text-[9px] ${isDark ? "border-[#3c4043] text-zinc-500" : "border-zinc-200 text-[#5f6368]"}`}>
+                  * Formulate structural practice responses using STAR alignment.
                 </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* SECTION 7: PROJECTS TO BUILD */}
+        {/* SECTION 7: RECOMMENDED PRACTICAL PROJECTS */}
         <section className={`border rounded-2xl p-6 md:p-8 print-card ${
-          isDark ? "bg-zinc-900/40 border-zinc-800" : "bg-white border-zinc-200 shadow-sm"
+          isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
         }`}>
-          <h2 className={`text-lg font-bold mb-6 flex items-center gap-2 ${isDark ? "text-white" : "text-zinc-950"}`}>
-            <span className="text-violet-500">04</span> Recommended Mitigation Projects
+          <h2 className={`text-lg font-bold mb-6 flex items-center gap-2 ${isDark ? "text-white" : "text-[#202124]"}`}>
+            <span className="text-[#1a73e8] dark:text-[#8ab4f8]">04</span> Recommended Audited Projects
           </h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {data.project_suggestions.slice(0, 3).map((proj, idx) => {
-              let diffColor = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+              let diffColor = "bg-[#34a853]/10 text-[#34a853] border-[#34a853]/20";
               if (proj.difficulty.toLowerCase() === "medium") {
-                diffColor = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                diffColor = "bg-[#fbbc05]/10 text-[#fbbc05] border-[#fbbc05]/20 dark:text-[#ffd54f]";
               } else if (proj.difficulty.toLowerCase() === "hard") {
-                diffColor = "bg-red-500/10 text-red-400 border-red-500/20";
+                diffColor = "bg-[#ea4335]/10 text-[#ea4335] border-[#ea4335]/20";
               }
 
               return (
                 <div
                   key={idx}
                   className={`border rounded-xl p-5 flex flex-col justify-between ${
-                    isDark ? "bg-zinc-950/20 border-zinc-800" : "bg-zinc-50 border-zinc-200 shadow-sm"
+                    isDark ? "bg-[#202124]/30 border-[#3c4043]" : "bg-[#f8f9fa] border-[#dadce0] shadow-sm"
                   }`}
                 >
                   <div>
@@ -890,21 +883,21 @@ export default function ResultsPage() {
                       </span>
                     </div>
 
-                    <h3 className={`text-xs md:text-sm font-bold mb-2 ${isDark ? "text-white" : "text-zinc-900"}`}>{proj.name}</h3>
-                    <p className={`text-[11px] leading-relaxed mb-5 ${isDark ? "text-zinc-400" : "text-zinc-655"}`}>
+                    <h3 className={`text-xs md:text-sm font-bold mb-2 ${isDark ? "text-white" : "text-[#202124]"}`}>{proj.name}</h3>
+                    <p className={`text-[11px] leading-relaxed mb-5 ${isDark ? "text-zinc-400" : "text-[#5f6368]"}`}>
                       {proj.description}
                     </p>
                   </div>
 
-                  <div className={`pt-3.5 border-t ${isDark ? "border-zinc-850" : "border-zinc-200"}`}>
+                  <div className={`pt-3.5 border-t ${isDark ? "border-[#3c4043]" : "border-[#dadce0]"}`}>
                     <div className="flex flex-wrap gap-1">
                       {proj.skills_practiced.map((sk, index) => (
                         <span
                           key={index}
-                          className={`text-[8px] font-semibold px-2 py-0.5 rounded border ${
+                          className={`text-[8px] font-bold px-2 py-0.5 rounded border ${
                             isDark
-                              ? "bg-zinc-900 text-zinc-450 border-zinc-800"
-                              : "bg-zinc-200 text-zinc-600 border-zinc-300"
+                              ? "bg-zinc-900 text-zinc-400 border-zinc-800"
+                              : "bg-white text-zinc-650 border-[#dadce0]"
                           }`}
                         >
                           {sk}
@@ -921,23 +914,22 @@ export default function ResultsPage() {
         {/* RECRUITER ASSESSMENT EXECUTIVE SUMMARY & ENCOURAGEMENT */}
         <section className={`border rounded-2xl p-6 md:p-8 relative overflow-hidden print-card ${
           isDark
-            ? "from-violet-950/15 via-indigo-950/10 to-transparent border-violet-500/20 bg-gradient-to-r"
-            : "from-violet-50/50 via-indigo-50/30 to-transparent border-violet-200 bg-gradient-to-r"
+            ? "from-[#1a73e8]/10 via-[#34a853]/5 to-transparent border-[#3c4043] bg-gradient-to-r"
+            : "from-[#1a73e8]/5 via-[#34a853]/3 to-transparent border-[#dadce0] bg-gradient-to-r"
         }`}>
-          {isDark && <div className="absolute top-0 right-0 w-24 h-24 bg-violet-600/5 rounded-full blur-2xl pointer-events-none" />}
-          <h2 className="text-xs font-bold tracking-widest text-violet-400 uppercase mb-4 animate-pulse">
-            Recruiter overall Assessment
+          <h2 className="text-xs font-bold tracking-wider text-[#1a73e8] dark:text-[#8ab4f8] uppercase mb-4 animate-pulse">
+            Auditing Executive Summary
           </h2>
-          <p className={`text-sm leading-relaxed mb-5 italic ${isDark ? "text-zinc-200" : "text-zinc-700 font-medium"}`}>
+          <p className={`text-sm leading-relaxed mb-5 italic ${isDark ? "text-zinc-200" : "text-[#202124] font-medium"}`}>
             "{data.executive_summary}"
           </p>
           <div className={`rounded-xl border p-4 mb-6 ${
-            isDark ? "bg-zinc-950/40 border-zinc-800" : "bg-zinc-50 border-zinc-200"
+            isDark ? "bg-[#2d2d30] border-[#3c4043]" : "bg-white border-[#dadce0] shadow-sm"
           }`}>
-            <h4 className={`text-[10px] font-bold mb-1 flex items-center gap-1.5 ${isDark ? "text-zinc-400" : "text-zinc-500"}`}>
+            <h4 className={`text-[10px] font-bold mb-1 flex items-center gap-1.5 ${isDark ? "text-zinc-400" : "text-[#5f6368]"}`}>
               <span>💡</span> Coach's Encouragement
             </h4>
-            <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-300" : "text-zinc-600"}`}>
+            <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-300" : "text-[#5f6368]"}`}>
               {data.encouragement}
             </p>
           </div>
@@ -945,19 +937,19 @@ export default function ResultsPage() {
           <div className="flex justify-center gap-4 no-print flex-col sm:flex-row">
             <button
               onClick={() => router.push("/")}
-              className={`font-extrabold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl transition-all shadow-md active:scale-95 border ${
+              className={`font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-full transition-all shadow-sm active:scale-95 border ${
                 isDark
-                  ? "bg-zinc-100 hover:bg-zinc-200 text-zinc-950 border-zinc-200"
-                  : "bg-zinc-900 hover:bg-zinc-850 text-white border-zinc-800"
+                  ? "bg-[#202124] hover:bg-[#3c4043] text-white border-[#3c4043]"
+                  : "bg-white hover:bg-zinc-150 text-[#3c4043] border-[#dadce0]"
               }`}
             >
               🔄 Analyze Another Profile
             </button>
             <button
               onClick={handlePrint}
-              className="bg-violet-600 hover:bg-violet-500 text-white font-extrabold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl transition-all shadow-md active:scale-95"
+              className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-full transition-all shadow-sm active:scale-95"
             >
-              📥 Download evaluation PDF
+              📥 Download Report PDF
             </button>
           </div>
         </section>
@@ -965,21 +957,21 @@ export default function ResultsPage() {
 
       {/* Footer */}
       <footer className={`border-t transition-colors no-print ${
-        isDark ? "border-zinc-900 bg-zinc-950/20 text-zinc-500" : "border-zinc-200 bg-zinc-100 text-zinc-500"
+        isDark ? "border-[#3c4043] bg-[#202124] text-zinc-500" : "border-[#dadce0] bg-[#f8f9fa] text-[#5f6368]"
       } py-6 text-center text-xs mt-10`}>
         <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p>© {new Date().getFullYear()} AI Placement Readiness Platform. All rights reserved.</p>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowTerms(true)}
-              className={`hover:underline font-semibold ${
-                isDark ? "text-violet-400" : "text-violet-600"
+              className={`hover:underline font-bold ${
+                isDark ? "text-[#8ab4f8]" : "text-[#1a73e8]"
               }`}
             >
               Terms & Conditions
             </button>
             <span>•</span>
-            <p>Powered by Gemini 2.5 Flash.</p>
+            <p>Powered by advanced placement analytics.</p>
           </div>
         </div>
       </footer>
@@ -988,15 +980,15 @@ export default function ResultsPage() {
       {showTerms && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className={`w-full max-w-2xl rounded-2xl border p-6 md:p-8 shadow-2xl relative max-h-[85vh] overflow-y-auto ${
-            isDark ? "bg-zinc-900 border-zinc-800 text-zinc-100" : "bg-white border-zinc-200 text-zinc-805"
+            isDark ? "bg-[#2d2d30] border-[#3c4043] text-[#e8eaed]" : "bg-white border-[#dadce0] text-[#3c4043]"
           }`}>
             {/* Close Button */}
             <button
               onClick={() => setShowTerms(false)}
               className={`absolute top-4 right-4 p-1.5 rounded-lg border transition ${
                 isDark
-                  ? "border-zinc-800 bg-zinc-950/40 hover:bg-zinc-800 text-zinc-450"
-                  : "border-zinc-200 bg-zinc-100 hover:bg-zinc-200 text-zinc-650"
+                  ? "border-[#3c4043] bg-[#202124] hover:bg-[#3c4043] text-zinc-450"
+                  : "border-[#dadce0] bg-[#f8f9fa] hover:bg-[#dadce0] text-zinc-650"
               }`}
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
@@ -1004,27 +996,27 @@ export default function ResultsPage() {
               </svg>
             </button>
 
-            <h2 className={`text-2xl font-extrabold mb-6 ${
-              isDark ? "text-white" : "text-zinc-950"
+            <h2 className={`text-2xl font-bold mb-6 ${
+              isDark ? "text-white" : "text-[#202124]"
             }`}>
               Terms & Conditions
             </h2>
 
-            <div className={`space-y-4 text-sm leading-relaxed mb-8 ${
-              isDark ? "text-zinc-300" : "text-zinc-600"
+            <div className={`space-y-4 text-xs leading-relaxed mb-8 ${
+              isDark ? "text-zinc-300" : "text-[#5f6368]"
             }`}>
               <p>
                 Welcome to the <strong>AI Placement Readiness Platform</strong>. By uploading your resume and specifying your GitHub profile, you acknowledge and agree to the following terms:
               </p>
-              <h3 className="font-bold text-base mt-4 text-violet-400">1. Data Collection & Processing</h3>
+              <h3 className="font-bold text-sm mt-4 text-[#1a73e8] dark:text-[#8ab4f8]">1. Data Collection & Processing</h3>
               <p>
-                Resume data text content is extracted entirely inside your browser client-side. No resume file is uploaded or stored on any server. Raw text payloads and public GitHub data are temporarily transmitted to the Gemini API routes strictly to generate your readiness analysis.
+                Resume text extraction is performed entirely inside the local client sandbox. No files are stored on outside servers. Raw text payloads and public GitHub data are temporarily transmitted strictly to form the readiness indices.
               </p>
-              <h3 className="font-bold text-base mt-4 text-violet-400">2. Accuracy of Assessments</h3>
+              <h3 className="font-bold text-sm mt-4 text-[#1a73e8] dark:text-[#8ab4f8]">2. Accuracy of Assessments</h3>
               <p>
-                Placements evaluations, score metrics, timelines, milestones, and project recommendations are AI-generated based on specific candidate parameters and public data sets. The assessment functions as a supplementary preparatory guide and does not guarantee job placement or recruiting results.
+                Evaluations, scores, roadmaps, and suggestions are AI-generated based on specific candidate parameters and public data sets. The reports function as a preparatory guide and do not guarantee recruitment outcomes.
               </p>
-              <h3 className="font-bold text-base mt-4 text-violet-400">3. Usage Terms</h3>
+              <h3 className="font-bold text-sm mt-4 text-[#1a73e8] dark:text-[#8ab4f8]">3. Usage Terms</h3>
               <p>
                 This platform is provided solely for educational, interview preparation, and placement evaluation purposes. Users agree not to abuse the analysis pipelines, input malformed payloads, or reverse-engineer the query aggregation handlers.
               </p>
@@ -1032,12 +1024,12 @@ export default function ResultsPage() {
 
             {/* Developer Mention */}
             <div className={`pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold ${
-              isDark ? "border-zinc-800 text-zinc-400" : "border-zinc-200 text-zinc-500"
+              isDark ? "border-[#3c4043] text-zinc-450" : "border-[#dadce0] text-[#5f6368]"
             }`}>
-              <span>Developed & Maintained by: <strong className="text-violet-500 text-sm font-extrabold">Yash Vardhan Singh</strong></span>
+              <span>Developed & Maintained by: <strong className="text-[#1a73e8] dark:text-[#8ab4f8] text-xs font-bold">Yash Vardhan Singh</strong></span>
               <button
                 onClick={() => setShowTerms(false)}
-                className="bg-violet-600 hover:bg-violet-500 text-white font-bold py-2 px-6 rounded-xl transition"
+                className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold py-2 px-6 rounded-full transition shadow-sm"
               >
                 Accept
               </button>
