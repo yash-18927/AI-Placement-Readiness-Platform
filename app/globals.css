@@ -111,12 +111,7 @@ html {
     color: #09090b !important;
   }
 
-  .text-violet-400, .text-indigo-400, .text-emerald-400, .text-red-400, .text-amber-400 {
-    color: #18181b !important;
-    font-weight: bold !important;
-  }
-
-  .bg-emerald-500\/10, .bg-red-500\/10, .bg-amber-500\/10, .bg-violet-500\/10 {
+  [class*="bg-emerald-500"], [class*="bg-red-500"], [class*="bg-amber-500"], [class*="bg-violet-500"] {
     background-color: #f4f4f5 !important;
     border: 1px solid #e4e4e7 !important;
   }

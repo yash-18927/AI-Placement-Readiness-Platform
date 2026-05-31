@@ -256,7 +256,7 @@ export default function ResultsPage() {
               className={`p-2 rounded-lg transition-colors border ${
                 isDark
                   ? "bg-[#2d2d30] border-[#3c4043] text-amber-400 hover:bg-[#3c4043]"
-                  : "bg-white border-[#dadce0] text-zinc-700 hover:bg-zinc-100 shadow-sm"
+                  : "bg-white border-[#dadce0] text-[#5f6368] hover:bg-[#dadce0] shadow-sm"
               }`}
               title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
@@ -269,18 +269,6 @@ export default function ResultsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
-            </button>
-
-            {/* Print Trigger */}
-            <button
-              onClick={handlePrint}
-              className={`text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full border transition ${
-                isDark
-                  ? "bg-[#2d2d30] border-[#3c4043] text-[#8ab4f8] hover:bg-[#3c4043] hover:text-white"
-                  : "bg-white border-[#dadce0] text-[#1a73e8] hover:bg-zinc-100 shadow-sm"
-              }`}
-            >
-              🖨 Print
             </button>
 
             {/* Back Home */}
@@ -313,15 +301,6 @@ export default function ResultsPage() {
             <p className={`text-xs mt-1.5 max-w-xl leading-relaxed ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
               Target Role: **{inferredRole}**. Calculated by analyzing technical credentials alongside public software indices.
             </p>
-          </div>
-
-          <div className="flex items-center gap-4 shrink-0">
-            <button
-              onClick={handlePrint}
-              className="bg-[#1a73e8] hover:bg-[#1557b0] text-white font-bold text-xs uppercase tracking-wider px-6 py-3.5 rounded-full shadow-sm hover:shadow active:scale-98 transition-all flex items-center gap-2 no-print"
-            >
-              📥 Download Report PDF
-            </button>
           </div>
         </section>
 
