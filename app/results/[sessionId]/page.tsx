@@ -59,6 +59,10 @@ export default function ResultsPage() {
   // Light / Dark Mode state (Google theme defaults to clean Light mode)
   const [isDark, setIsDark] = useState<boolean>(false);
 
+  // Support Center Modal States
+  const [showSupportModal, setShowSupportModal] = useState<boolean>(false);
+  const [supportTab, setSupportTab] = useState<"help" | "feedback" | "contact">("help");
+
   // PDF Export Options Panel State
   const [showExportPanel, setShowExportPanel] = useState<boolean>(false);
   const [exportAction, setExportAction] = useState<"download" | "print">("download");
@@ -1148,10 +1152,238 @@ export default function ResultsPage() {
               Terms & Conditions
             </button>
             <span>•</span>
-            <p>Powered by advanced placement analytics.</p>
+            <button
+              onClick={() => { setSupportTab("help"); setShowSupportModal(true); }}
+              className={`hover:underline font-bold ${
+                isDark ? "text-[#8ab4f8]" : "text-[#1a73e8]"
+              }`}
+            >
+              Help
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => { setSupportTab("feedback"); setShowSupportModal(true); }}
+              className={`hover:underline font-bold ${
+                isDark ? "text-[#8ab4f8]" : "text-[#1a73e8]"
+              }`}
+            >
+              Feedback
+            </button>
+            <span>•</span>
+            <button
+              onClick={() => { setSupportTab("contact"); setShowSupportModal(true); }}
+              className={`hover:underline font-bold ${
+                isDark ? "text-[#8ab4f8]" : "text-[#1a73e8]"
+              }`}
+            >
+              Contact
+            </button>
           </div>
         </div>
       </footer>
+
+      {/* Support & Feedback Center Modal */}
+      {showSupportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in no-print">
+          <div className={`w-full max-w-lg rounded-2xl border p-6 md:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto flex flex-col gap-6 transition-all transform scale-100 ${
+            isDark ? "bg-[#2d2d30] border-[#3c4043] text-[#e8eaed]" : "bg-white border-[#dadce0] text-[#3c4043]"
+          }`}>
+            
+            {/* Close Button */}
+            <button
+              onClick={() => setShowSupportModal(false)}
+              className={`absolute top-4 right-4 p-1.5 rounded-lg border transition ${
+                isDark
+                  ? "border-[#3c4043] bg-[#202124] hover:bg-[#3c4043] text-zinc-400"
+                  : "border-[#dadce0] bg-[#f8f9fa] hover:bg-[#dadce0] text-zinc-650"
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Header */}
+            <div>
+              <h2 className={`text-xl font-bold tracking-tight ${isDark ? "text-white" : "text-[#202124]"}`}>
+                Support & Insights
+              </h2>
+              <p className={`text-xs mt-1 ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
+                Get help, share feedback, or connect directly.
+              </p>
+            </div>
+
+            {/* Tab Selector (Pill Style) */}
+            <div className={`flex rounded-xl p-1 gap-1 ${isDark ? "bg-[#202124]" : "bg-zinc-100"}`}>
+              {(["help", "feedback", "contact"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setSupportTab(tab)}
+                  className={`flex-1 text-center py-2.5 rounded-lg font-bold text-xs uppercase tracking-wider transition-all ${
+                    supportTab === tab
+                      ? isDark
+                        ? "bg-[#1a73e8] text-white shadow-md"
+                        : "bg-white text-[#1a73e8] shadow-sm border border-zinc-200"
+                      : isDark
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-zinc-550 hover:text-zinc-800"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+
+            {/* Tab Content Panel */}
+            <div className="flex-1 flex flex-col gap-4">
+              {supportTab === "help" && (
+                <div className="flex flex-col gap-4 animate-fade-in">
+                  {/* Quote Banner */}
+                  <div className={`p-4 rounded-xl border border-dashed flex flex-col gap-1 ${
+                    isDark ? "bg-[#1a73e8]/10 border-[#1a73e8]/30" : "bg-[#1a73e8]/5 border-[#1a73e8]/20"
+                  }`}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] dark:text-[#8ab4f8]">Developer Note</span>
+                    <p className="text-xs font-medium italic leading-relaxed text-zinc-700 dark:text-zinc-300">
+                      "I am experienced. We will move forward to fix it."
+                    </p>
+                  </div>
+
+                  {/* Pre-written basic predictable queries (FAQs) */}
+                  <div className="flex flex-col gap-2">
+                    <h3 className={`text-[11px] font-bold uppercase tracking-wider ${isDark ? "text-zinc-400" : "text-zinc-500"}`}>
+                      Common predictable queries
+                    </h3>
+                    <div className="flex flex-col gap-2.5 max-h-[30vh] overflow-y-auto pr-1">
+                      {[
+                        {
+                          q: "How is my placement readiness index calculated?",
+                          a: "Our evaluation pipeline extracts technical domain keywords and matches them against target industrial requirements while parsing your public GitHub repositories to measure skill metrics."
+                        },
+                        {
+                          q: "Can I download or print the generated roadmaps?",
+                          a: "Yes! At the bottom of the dashboard page, you'll find print-optimized controls. You can save the entire roadmap directly as a clean PDF or print a hard copy."
+                        },
+                        {
+                          q: "How can I fix GitHub integration connection errors?",
+                          a: "Make sure the GitHub username is valid and has public repositories. If the username is private or contains zero repositories, the analyzer might fail to read stats."
+                        },
+                        {
+                          q: "Is my personal resume data stored permanently?",
+                          a: "No! Your resume text is parsed in memory to build the vectors. All your evaluation sessions are private and stored in your secure browser local history context."
+                        }
+                      ].map((item, idx) => (
+                        <div key={idx} className={`p-3.5 rounded-xl border transition-all ${
+                          isDark ? "border-[#3c4043] bg-[#202124]/30" : "border-zinc-200 bg-zinc-50/50"
+                        }`}>
+                          <h4 className={`text-xs font-bold ${isDark ? "text-white" : "text-zinc-800"}`}>
+                            {item.q}
+                          </h4>
+                          <p className={`text-[11px] leading-relaxed mt-1.5 ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
+                            {item.a}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pre-written Email Help Trigger */}
+                  <a
+                    href={`mailto:aysingh18927@gmail.com?subject=${encodeURIComponent("[APRP Help] Support Request")}&body=${encodeURIComponent("Hi Yashvardhan,\n\nI need assistance with the following issue:\n\n1. Target Placement Role: \n2. Description of the issue: \n3. Steps to reproduce: \n\nBest regards,")}`}
+                    className="w-full text-center text-xs font-bold py-3 rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white transition-all shadow-sm active:scale-98 flex items-center justify-center gap-2 mt-2"
+                  >
+                    <span>✉</span> Launch Email Support
+                  </a>
+                </div>
+              )}
+
+              {supportTab === "feedback" && (
+                <div className="flex flex-col gap-4 animate-fade-in">
+                  {/* Quote Banner */}
+                  <div className={`p-4 rounded-xl border border-dashed flex flex-col gap-1 ${
+                    isDark ? "bg-emerald-500/10 border-emerald-500/30" : "bg-emerald-500/5 border-emerald-500/20"
+                  }`}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">Developer Note</span>
+                    <p className="text-xs font-medium italic leading-relaxed text-zinc-700 dark:text-zinc-300">
+                      "I am pleased you used it, and in Feedback, give me your insightful reviews. I will try to improve it."
+                    </p>
+                  </div>
+
+                  <p className={`text-xs leading-relaxed ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
+                    Your reviews help shape the next versions of this platform. Select one of our template frameworks below to send your structured review directly to <span className="font-bold">aysingh18927@gmail.com</span>:
+                  </p>
+
+                  {/* Feedback Templates */}
+                  <div className="flex flex-col gap-2">
+                    {[
+                      {
+                        title: "🚀 General Experience Review",
+                        desc: "Send a rating, highlight what stood out, and provide general feedback.",
+                        subject: "[APRP Feedback] General Platform Experience",
+                        body: "Hi Yashvardhan,\n\nHere is my general experience review:\n\n1. Overall Platform Rating (1-5): \n2. My favorite feature: \n3. Areas that can be refined: \n\nBest regards,"
+                      },
+                      {
+                        title: "🧠 Dynamic Roadmap Evaluation",
+                        desc: "Review the quality of the parsed week-by-week learning checklists.",
+                        subject: "[APRP Feedback] Roadmap & Skill Checklists Review",
+                        body: "Hi Yashvardhan,\n\nHere is my review on the generated roadmaps:\n\n1. Did the weekly goals fit your skill level? (Yes/No): \n2. How helpful were the recommended projects?: \n3. Suggestions for improvement: \n\nBest regards,"
+                      }
+                    ].map((tpl, idx) => (
+                      <a
+                        key={idx}
+                        href={`mailto:aysingh18927@gmail.com?subject=${encodeURIComponent(tpl.subject)}&body=${encodeURIComponent(tpl.body)}`}
+                        className={`p-3.5 rounded-xl border text-left hover:scale-[1.01] hover:border-emerald-500/50 transition-all block ${
+                          isDark ? "border-[#3c4043] bg-[#202124]/30" : "border-zinc-200 bg-zinc-50/50"
+                        }`}
+                      >
+                        <h4 className={`text-xs font-bold ${isDark ? "text-white" : "text-zinc-800"}`}>
+                          {tpl.title}
+                        </h4>
+                        <p className={`text-[10px] mt-1 ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
+                          {tpl.desc}
+                        </p>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {supportTab === "contact" && (
+                <div className="flex flex-col gap-4 animate-fade-in">
+                  {/* Quote Banner */}
+                  <div className={`p-4 rounded-xl border border-dashed flex flex-col gap-1 ${
+                    isDark ? "bg-[#1a73e8]/10 border-[#1a73e8]/30" : "bg-[#1a73e8]/5 border-[#1a73e8]/20"
+                  }`}>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] dark:text-[#8ab4f8]">Developer Note</span>
+                    <p className="text-xs font-medium italic leading-relaxed text-zinc-700 dark:text-zinc-300">
+                      "Good to see you. Let's share what's on your mind."
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-2.5 text-center py-4">
+                    <p className={`text-xs ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
+                      Direct developer contact path
+                    </p>
+                    <span className={`text-lg font-extrabold tracking-tight ${isDark ? "text-white" : "text-[#202124]"}`}>
+                      aysingh18927@gmail.com
+                    </span>
+                  </div>
+
+                  <p className={`text-xs leading-relaxed text-center ${isDark ? "text-[#9aa0a6]" : "text-[#5f6368]"}`}>
+                    Click below to open your email client and instantly share whatever is on your mind!
+                  </p>
+
+                  <a
+                    href={`mailto:aysingh18927@gmail.com?subject=${encodeURIComponent("[APRP Contact] Let's Connect")}&body=${encodeURIComponent("Hi Yashvardhan,\n\nI wanted to reach out regarding:\n\n[Write message here]\n\nBest regards,")}`}
+                    className="w-full text-center text-xs font-bold py-3 rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white transition-all shadow-sm active:scale-98 flex items-center justify-center gap-2 mt-2"
+                  >
+                    <span>✉</span> Send Direct Message
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Terms and Conditions Modal */}
       {showTerms && (
