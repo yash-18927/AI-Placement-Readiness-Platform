@@ -59,6 +59,9 @@ export default function ResultsPage() {
   // Light / Dark Mode state (Google theme defaults to clean Light mode)
   const [isDark, setIsDark] = useState<boolean>(false);
 
+  // PDF Export Format Mode Toggle State
+  const [exportMode, setExportMode] = useState<"paper" | "digital">("paper");
+
   // Load theme preference and analysis data from localStorage on mount
   useEffect(() => {
     setIsClient(true);
@@ -147,7 +150,20 @@ export default function ResultsPage() {
   };
 
   const handlePrint = () => {
+    const root = window.document.documentElement;
+    if (exportMode === "digital") {
+      root.classList.add("print-digital-theme");
+    } else {
+      root.classList.remove("print-digital-theme");
+    }
+    
+    // Trigger native print workflow
     window.print();
+    
+    // Clean up class after dialog opens to prevent style leakage
+    setTimeout(() => {
+      root.classList.remove("print-digital-theme");
+    }, 1000);
   };
 
   if (loading) {
@@ -911,6 +927,60 @@ export default function ResultsPage() {
             <p className={`text-xs leading-relaxed ${isDark ? "text-zinc-300" : "text-[#5f6368]"}`}>
               {data.encouragement}
             </p>
+          </div>
+
+          {/* Interactive Export Mode Selection Panel */}
+          <div className="mb-6 p-4 rounded-xl border border-[#dadce0] dark:border-[#3c4043] bg-[#f8f9fa] dark:bg-[#202124] no-print">
+            <h4 className={`text-xs font-bold uppercase tracking-wider mb-3 text-left ${
+              isDark ? "text-white" : "text-[#202124]"
+            }`}>
+              Select PDF Export Format
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Option 1: Recruiter Handout */}
+              <div
+                onClick={() => setExportMode("paper")}
+                className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                  exportMode === "paper"
+                    ? "border-[#34a853] bg-[#34a853]/5 dark:bg-[#34a853]/10"
+                    : "border-[#dadce0] dark:border-[#3c4043] bg-white dark:bg-[#2d2d30] hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="exportMode"
+                  checked={exportMode === "paper"}
+                  onChange={() => setExportMode("paper")}
+                  className="mt-0.5 accent-[#34a853]"
+                />
+                <div className="text-left">
+                  <p className="text-xs font-bold dark:text-white">📄 Recruiter Handout Format</p>
+                  <p className="text-[10px] text-zinc-500 mt-0.5">Optimized for physical printing on standard A4 paper. Strips backgrounds and handles page breaks cleanly.</p>
+                </div>
+              </div>
+
+              {/* Option 2: Digital Career Portfolio */}
+              <div
+                onClick={() => setExportMode("digital")}
+                className={`flex items-start gap-3 p-3.5 rounded-xl border cursor-pointer transition-all ${
+                  exportMode === "digital"
+                    ? "border-[#1a73e8] bg-[#1a73e8]/5 dark:bg-[#1a73e8]/10"
+                    : "border-[#dadce0] dark:border-[#3c4043] bg-white dark:bg-[#2d2d30] hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="exportMode"
+                  checked={exportMode === "digital"}
+                  onChange={() => setExportMode("digital")}
+                  className="mt-0.5 accent-[#1a73e8]"
+                />
+                <div className="text-left">
+                  <p className="text-xs font-bold dark:text-white">💻 Digital Career Portfolio</p>
+                  <p className="text-[10px] text-zinc-500 mt-0.5">Optimized for digital sharing. Preserves your active light/dark dashboard theme styling perfectly.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-center gap-4 no-print flex-col sm:flex-row">

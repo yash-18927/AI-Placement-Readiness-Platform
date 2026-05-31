@@ -53,71 +53,128 @@ html {
 
 /* SaaS Custom Printing stylesheet */
 @media print {
+  /* Dynamic Digital Portfolio vs Standard Paper configurations */
   body, html {
     background: #ffffff !important;
-    color: #09090b !important;
-    font-size: 12pt !important;
+    color: #202124 !important;
+    font-size: 11pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
   }
 
-  /* Hide interactive controls and screenspace UI elements */
-  header, footer, button, select, input, .no-print, [role="tablist"], [title="Switch to Light Mode"], [title="Switch to Dark Mode"] {
+  /* Set page margins cleanly */
+  @page {
+    size: A4 portrait;
+    margin: 1.5cm 1.5cm 1.5cm 1.5cm;
+  }
+
+  /* Hide interactive screenspace controls, navigations and option panels */
+  header, footer, button, select, input, .no-print, [role="tablist"], [title="Switch to Light Mode"], [title="Switch to Dark Mode"], .theme-toggle-pane {
     display: none !important;
   }
 
-  /* Force print background colors/gradients */
+  /* Force browsers to print exact background colors and vector parameters */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Layout optimization for paper sheet sizes */
-  .max-w-6xl {
-    max-width: 100% !important;
-    width: 100% !important;
+  /* Simplify grids to standard single-column blocks to prevent clipping or text overlap */
+  main {
     padding: 0 !important;
     margin: 0 !important;
+    display: block !important;
   }
 
-  /* Ensure card blocks are clean and avoid awkward middle-cutoffs */
+  .grid, .lg\:grid-cols-12, .grid-cols-1, .grid-cols-3, .lg\:grid-cols-3 {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Ensure card blocks are properly isolated and avoid breaking awkwardly in mid-sheet */
   .print-card {
-    border: 1px solid #e4e4e7 !important;
+    border: 1px solid #dadce0 !important;
     background: #ffffff !important;
     box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    margin-bottom: 20px !important;
+    margin-bottom: 24px !important;
     padding: 20px !important;
-    border-radius: 8px !important;
-    color: #09090b !important;
+    border-radius: 12px !important;
+    color: #202124 !important;
+    display: block !important;
+    width: 100% !important;
   }
 
-  /* Display all roadmap steps at once during PDF output instead of hiding behind active tabs */
+  /* Preserve SVG circular score layouts in center */
+  .relative.w-36.h-36 {
+    margin: 0 auto !important;
+  }
+
+  /* Render all 3 roadmap steps sequentially for physical report pages */
   .roadmap-print-all {
     display: block !important;
+    width: 100% !important;
   }
 
   .roadmap-tab-panel {
     display: block !important;
-    margin-bottom: 25px !important;
-    border: 1px solid #e4e4e7 !important;
-    padding: 15px !important;
-    border-radius: 8px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid #dadce0 !important;
+    padding: 16px !important;
+    border-radius: 12px !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  /* Typography color stabilization for paper ink */
+  /* Color resets for recruiter handouts */
   h1, h2, h3, h4, strong {
-    color: #09090b !important;
+    color: #202124 !important;
   }
 
+  /* Universal print highlights */
   [class*="bg-emerald-500"], [class*="bg-red-500"], [class*="bg-amber-500"], [class*="bg-violet-500"] {
-    background-color: #f4f4f5 !important;
-    border: 1px solid #e4e4e7 !important;
+    background-color: #f8f9fa !important;
+    border: 1px solid #dadce0 !important;
+    color: #202124 !important;
   }
 
-  /* Layout spacing */
-  main {
-    padding-top: 0 !important;
+  /* Preserve full rich colors if Digital Portfolio Mode is selected */
+  .print-digital-theme {
+    background-color: #202124 !important;
+    color: #e8eaed !important;
+  }
+
+  .print-digital-theme .print-card {
+    background-color: #2d2d30 !important;
+    border-color: #3c4043 !important;
+    color: #e8eaed !important;
+  }
+
+  .print-digital-theme h1, 
+  .print-digital-theme h2, 
+  .print-digital-theme h3, 
+  .print-digital-theme h4, 
+  .print-digital-theme strong {
+    color: #ffffff !important;
+  }
+
+  .print-digital-theme [class*="bg-emerald-500"] {
+    background-color: rgba(52, 168, 83, 0.15) !important;
+    border-color: rgba(52, 168, 83, 0.25) !important;
+    color: #81c784 !important;
+  }
+
+  .print-digital-theme [class*="bg-red-500"] {
+    background-color: rgba(234, 67, 53, 0.15) !important;
+    border-color: rgba(234, 67, 53, 0.25) !important;
+    color: #e57373 !important;
+  }
+
+  .print-digital-theme [class*="bg-amber-500"] {
+    background-color: rgba(251, 188, 5, 0.15) !important;
+    border-color: rgba(251, 188, 5, 0.25) !important;
+    color: #ffd54f !important;
   }
 }
