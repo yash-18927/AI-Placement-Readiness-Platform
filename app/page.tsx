@@ -19,6 +19,11 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Cooldown states
+  const [cooldownTimeLeft, setCooldownTimeLeft] = useState<number | null>(null);
+  const [cooldownType, setCooldownType] = useState<"rate-limit" | "overload" | null>(null);
+  const [cooldownMax, setCooldownMax] = useState<number>(60);
+
   // UX elements states
   const [isDragOver, setIsDragOver] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -64,6 +69,30 @@ export default function Home() {
       console.error("Failed to load evaluation history:", err);
     }
 
+    // Check for existing API cooldown on mount
+    try {
+      const cooldownUntilStr = localStorage.getItem("placement_readiness_cooldown_until");
+      const storedType = localStorage.getItem("placement_readiness_cooldown_type") as "rate-limit" | "overload" | null;
+      const storedMax = localStorage.getItem("placement_readiness_cooldown_max");
+      
+      if (cooldownUntilStr) {
+        const cooldownUntil = parseInt(cooldownUntilStr, 10);
+        const now = Date.now();
+        if (cooldownUntil > now) {
+          const timeLeft = Math.ceil((cooldownUntil - now) / 1000);
+          setCooldownTimeLeft(timeLeft);
+          setCooldownType(storedType || "rate-limit");
+          setCooldownMax(storedMax ? parseInt(storedMax, 10) : 60);
+        } else {
+          localStorage.removeItem("placement_readiness_cooldown_until");
+          localStorage.removeItem("placement_readiness_cooldown_type");
+          localStorage.removeItem("placement_readiness_cooldown_max");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to parse cooldown state from localStorage:", err);
+    }
+
     // PWA beforeinstallprompt event capture
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -81,6 +110,32 @@ export default function Home() {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
     };
   }, []);
+
+  // Cooldown countdown timer logic
+  useEffect(() => {
+    if (cooldownTimeLeft === null || cooldownTimeLeft <= 0) {
+      if (cooldownTimeLeft === 0) {
+        setCooldownTimeLeft(null);
+        setCooldownType(null);
+        localStorage.removeItem("placement_readiness_cooldown_until");
+        localStorage.removeItem("placement_readiness_cooldown_type");
+        localStorage.removeItem("placement_readiness_cooldown_max");
+      }
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setCooldownTimeLeft((prev) => {
+        if (prev === null || prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldownTimeLeft]);
 
   // Dynamically apply theme to document element
   useEffect(() => {
@@ -240,6 +295,10 @@ export default function Home() {
       setError("Please specify a valid GitHub developer username.");
       return;
     }
+    if (cooldownTimeLeft !== null && cooldownTimeLeft > 0) {
+      setError("API is cooling down. Please wait for the timer to finish.");
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -248,6 +307,7 @@ export default function Home() {
     setApiData(null);
 
     const sessionId = generateUUID();
+    let interval: NodeJS.Timeout;
 
     // Trigger API call in the background
     const apiCallPromise = fetch("/api/analyze", {
@@ -264,7 +324,27 @@ export default function Home() {
     })
       .then(async (res) => {
         if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
+          let errData;
+          try {
+            errData = await res.json();
+          } catch (_) {
+            errData = {};
+          }
+          
+          if (errData.isRateLimit || errData.isOverload || res.status === 429 || res.status === 503) {
+            const cooldownSecs = errData.cooldownSeconds || 60;
+            const type = errData.isRateLimit || res.status === 429 ? "rate-limit" : "overload";
+            const cooldownUntil = Date.now() + cooldownSecs * 1000;
+            
+            localStorage.setItem("placement_readiness_cooldown_until", cooldownUntil.toString());
+            localStorage.setItem("placement_readiness_cooldown_type", type);
+            localStorage.setItem("placement_readiness_cooldown_max", cooldownSecs.toString());
+            
+            setCooldownTimeLeft(cooldownSecs);
+            setCooldownType(type);
+            setCooldownMax(cooldownSecs);
+          }
+          
           throw new Error(errData.error || "Profile analysis failed.");
         }
         return res.json();
@@ -279,11 +359,12 @@ export default function Home() {
         setError(err.message || "An unexpected error occurred during processing.");
         setIsLoading(false);
         setActiveStep(0);
+        if (interval) clearInterval(interval);
       });
 
     // Start interval for step-by-step progress
     let step = 1;
-    const interval = setInterval(() => {
+    interval = setInterval(() => {
       step += 1;
       if (step <= 5) {
         setActiveStep(step);
@@ -689,11 +770,78 @@ export default function Home() {
             </div>
 
             {error && (
-              <div className="m-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-[#ea4335] text-xs flex items-start gap-3">
+              <div className="m-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-[#ea4335] text-xs flex items-start gap-3 animate-fade-in">
                 <span className="text-md leading-none">⚠️</span>
                 <div>
                   <strong className="font-bold block mb-0.5">Input Specification Alert</strong>
                   {error}
+                </div>
+              </div>
+            )}
+
+            {cooldownTimeLeft !== null && cooldownTimeLeft > 0 && (
+              <div className="m-6 p-6 rounded-2xl border transition-all duration-300 animate-fade-in bg-gradient-to-br from-amber-500/5 via-red-500/5 to-amber-500/5 dark:from-amber-500/10 dark:via-red-500/10 dark:to-amber-500/10 border-amber-500/20 dark:border-amber-500/30 shadow-sm">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  {/* Timer Ring */}
+                  <div className="relative flex items-center justify-center w-24 h-24 shrink-0">
+                    <svg className="w-full h-full transform -rotate-90">
+                      {/* Background circle */}
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="40"
+                        className="stroke-zinc-200 dark:stroke-zinc-800"
+                        strokeWidth="6"
+                        fill="transparent"
+                      />
+                      {/* Progress circle */}
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="40"
+                        className="stroke-amber-500 dark:stroke-amber-400 transition-all duration-1000 ease-linear"
+                        strokeWidth="6"
+                        fill="transparent"
+                        strokeDasharray={2 * Math.PI * 40}
+                        strokeDashoffset={((cooldownMax - cooldownTimeLeft) / cooldownMax) * (2 * Math.PI * 40)}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    {/* Inner Timer Text */}
+                    <div className="absolute flex flex-col items-center justify-center">
+                      <span className="font-mono text-xl font-bold tracking-tight text-[#ea4335] dark:text-[#f28b82] animate-pulse">
+                        {String(Math.floor(cooldownTimeLeft / 60)).padStart(2, "0")}
+                        :
+                        {String(cooldownTimeLeft % 60).padStart(2, "0")}
+                      </span>
+                      <span className="text-[9px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-bold mt-0.5">
+                        Cooling
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Description text */}
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="flex items-center justify-center md:justify-start gap-2 mb-2">
+                      <span className="text-lg">🔥</span>
+                      <h3 className="font-bold text-xs uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                        {cooldownType === "rate-limit" ? "API Quota Exhausted" : "API Server Overloaded"}
+                      </h3>
+                    </div>
+                    
+                    <p className="text-xs leading-relaxed text-zinc-650 dark:text-zinc-300">
+                      {cooldownType === "rate-limit"
+                        ? "Multiple friends are checking their placement readiness at the same time! Our Gemini API key quota has been exhausted. We have triggered a protective cooldown to prevent connection bans."
+                        : "The Gemini AI model servers are currently experiencing extreme demand. We are pausing requests briefly to let the API cool down."}
+                    </p>
+
+                    <div className="mt-3 flex items-center justify-center md:justify-start gap-4">
+                      <span className="text-[10px] text-zinc-550 dark:text-zinc-400 flex items-center gap-1.5 font-semibold">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                        Retrying automatically in {cooldownTimeLeft}s
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -835,11 +983,11 @@ export default function Home() {
                 {/* Analyze Trigger */}
                 <button
                   onClick={handleAnalyze}
-                  disabled={isLoading || !resumeText || !githubUsername}
+                  disabled={isLoading || !resumeText || !githubUsername || (cooldownTimeLeft !== null && cooldownTimeLeft > 0)}
                   className={`w-full font-bold uppercase tracking-wider text-xs py-4 px-6 rounded-full transition-all shadow-sm mt-2 flex items-center justify-center gap-2 text-white ${
-                    isLoading || !resumeText || !githubUsername
+                    isLoading || !resumeText || !githubUsername || (cooldownTimeLeft !== null && cooldownTimeLeft > 0)
                       ? isDark
-                        ? "bg-[#2d2d30] text-zinc-600 cursor-not-allowed border border-[#3c4043]"
+                        ? "bg-[#2d2d30] text-zinc-650 cursor-not-allowed border border-[#3c4043]"
                         : "bg-zinc-200 text-zinc-400 cursor-not-allowed border border-zinc-300"
                       : "bg-[#1a73e8] hover:bg-[#1557b0] active:scale-[0.99] shadow-md shadow-[#1a73e8]/10"
                   }`}
@@ -851,6 +999,10 @@ export default function Home() {
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                       </svg>
                       COMPILING DATA...
+                    </span>
+                  ) : cooldownTimeLeft !== null && cooldownTimeLeft > 0 ? (
+                    <span className="flex items-center gap-2">
+                      ⏳ API COOLING DOWN ({cooldownTimeLeft}s)
                     </span>
                   ) : (
                     <>

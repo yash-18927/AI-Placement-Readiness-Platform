@@ -6,6 +6,31 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { resumeText, githubUsername, targetRole, sessionId } = body;
 
+    if (githubUsername === "mock-rate-limit") {
+      return NextResponse.json(
+        {
+          error: "API rate limit exceeded. Multiple users are running analyses simultaneously, exceeding the Gemini API free-tier threshold.",
+          details: "Resource has been exhausted (e.g. API quota limit reached).",
+          isRateLimit: true,
+          isOverload: false,
+          cooldownSeconds: 45
+        },
+        { status: 429 }
+      );
+    }
+    if (githubUsername === "mock-overload") {
+      return NextResponse.json(
+        {
+          error: "API service is overloaded. Gemini model servers are currently experiencing high request volumes. API is cooling down.",
+          details: "Service Unavailable (503 Overload).",
+          isRateLimit: false,
+          isOverload: true,
+          cooldownSeconds: 45
+        },
+        { status: 503 }
+      );
+    }
+
     if (!resumeText || !githubUsername || !targetRole) {
       return NextResponse.json(
         { error: "Missing required fields: resumeText, githubUsername, and targetRole are all required." },
@@ -130,6 +155,7 @@ Return ONLY this JSON with ALL fields filled:
     // 3. Make request to Gemini with automatic Key Rotation
     let responseText = "";
     let lastError: any = null;
+    const errors: any[] = [];
 
     for (let i = 0; i < apiKeys.length; i++) {
       const activeKey = apiKeys[i];
@@ -154,12 +180,71 @@ Return ONLY this JSON with ALL fields filled:
         }
       } catch (err: any) {
         console.warn(`Gemini key index ${i + 1} failed:`, err.message || err);
+        errors.push(err);
         lastError = err;
       }
     }
 
     if (!responseText) {
-      throw new Error(`All configured Gemini API keys failed to generate a response. Last error: ${lastError?.message || lastError}`);
+      // Analyze errors to see if rate limit or overload happened
+      let isRateLimit = false;
+      let isOverload = false;
+
+      const checkErrorType = (err: any) => {
+        const msg = String(err?.message || err).toLowerCase();
+        const status = err?.status || err?.statusCode || 0;
+
+        if (
+          status === 429 ||
+          msg.includes("429") ||
+          msg.includes("quota") ||
+          msg.includes("limit") ||
+          msg.includes("exhausted") ||
+          msg.includes("resource_exhausted")
+        ) {
+          isRateLimit = true;
+        }
+
+        if (
+          status === 503 ||
+          msg.includes("503") ||
+          msg.includes("overload") ||
+          msg.includes("unavailable") ||
+          msg.includes("heating")
+        ) {
+          isOverload = true;
+        }
+      };
+
+      errors.forEach(checkErrorType);
+
+      const lastErrorMessage = lastError?.message || String(lastError);
+
+      if (isRateLimit) {
+        return NextResponse.json(
+          {
+            error: "API rate limit exceeded. Multiple users are running analyses simultaneously, exceeding the Gemini API free-tier threshold.",
+            details: lastErrorMessage,
+            isRateLimit: true,
+            isOverload: false,
+            cooldownSeconds: 60
+          },
+          { status: 429 }
+        );
+      } else if (isOverload) {
+        return NextResponse.json(
+          {
+            error: "API service is overloaded. Gemini model servers are currently experiencing high request volumes. API is cooling down.",
+            details: lastErrorMessage,
+            isRateLimit: false,
+            isOverload: true,
+            cooldownSeconds: 60
+          },
+          { status: 503 }
+        );
+      } else {
+        throw new Error(`All configured Gemini API keys failed to generate a response. Last error: ${lastErrorMessage}`);
+      }
     }
 
     // 4. Safe parsing of response JSON (stripping markdown fences)
